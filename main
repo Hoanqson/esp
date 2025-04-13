@@ -1,12 +1,1771 @@
---[[
- .____                  ________ ___.    _____                           __                
- |    |    __ _______   \_____  \\_ |___/ ____\_ __  ______ ____ _____ _/  |_  ___________ 
- |    |   |  |  \__  \   /   |   \| __ \   __\  |  \/  ___// ___\\__  \\   __\/  _ \_  __ \
- |    |___|  |  // __ \_/    |    \ \_\ \  | |  |  /\___ \\  \___ / __ \|  | (  <_> )  | \/
- |_______ \____/(____  /\_______  /___  /__| |____//____  >\___  >____  /__|  \____/|__|   
-         \/          \/         \/    \/                \/     \/     \/                   
-          \_Welcome to LuaObfuscator.com   (Alpha 0.10.9) ~  Much Love, Ferib 
+local player = game.Players.LocalPlayer
+local character = player.Character or player.CharacterAdded:Wait()
+local hrp = character:WaitForChild("HumanoidRootPart")
+local humanoid = character:WaitForChild("Humanoid")
 
-]]--
+-- Cấu hình có thể thay đổi
+local CONFIG = {
+    -- Cấu hình ESP
+    targetNames = {"Bond"}, -- Tên item cần tìm, có thể thêm nhiều tên
+    espColor = Color3.fromRGB(0, 191, 255), -- Màu của nhãn ESP (xanh dương)
+    maxDistance = 1000, -- Khoảng cách tối đa để hiển thị ESP (đơn vị studs)
+    updateInterval = 1, -- Cập nhật ESP mỗi giây
+    refreshInterval = 5, -- Thời gian làm mới danh sách vật phẩm (giây)
+    toggleKey = Enum.KeyCode.B, -- Phím để bật/tắt ESP
+    espSize = UDim2.new(0, 200, 0, 50), -- Kích thước của nhãn ESP (rộng, cao)
+    espFont = Enum.Font.SourceSansBold, -- Font của nhãn ESP
+    espTextSize = 16, -- Kích thước chữ của nhãn ESP
+    espTextStrokeTransparency = 0, -- Độ trong suốt của viền chữ ESP
+    espTextStrokeColor = Color3.new(0, 0, 0), -- Màu viền chữ ESP
+    useRandomColors = true, -- Sử dụng màu ngẫu nhiên cho các vật phẩm khác nhau
+    itemColors = {}, -- Lưu màu cho mỗi loại vật phẩm
 
-local v0=string.char;local v1=string.byte;local v2=string.sub;local v3=bit32 or bit ;local v4=v3.bxor;local v5=table.concat;local v6=table.insert;local function v7(v28,v29) local v30={};for v162=1, #v28 do v6(v30,v0(v4(v1(v2(v28,v162,v162 + 1 )),v1(v2(v29,1 + (v162% #v29) ,1 + (v162% #v29) + 1 )))%256 ));end return v5(v30);end local v8=game.Players.LocalPlayer;local v9=v8.Character or v8.CharacterAdded:Wait() ;local v10=v9:WaitForChild(v7("\249\214\214\36\232\180\206\26\227\204\212\49\214\186\213\10","\126\177\163\187\69\134\219\167"));local v11={[v7("\55\204\56\194\249\55\227\43\200\249\48","\156\67\173\74\165")]={v7("\22\184\71\18","\38\84\215\41\118\220\70")},[v7("\85\5\50\49\241\92\25\48","\158\48\118\66\114")]=Color3.fromRGB(0 + 0 ,108 + 83 ,753 -498 ),[v7("\166\37\8\18\122\182\239\170\42\19\51","\155\203\68\112\86\19\197")]=1711 -(530 + 181) ,[v7("\83\205\50\253\84\125\204\246\82\216\36\234\65\116","\152\38\189\86\156\32\24\133")]=2 -1 ,[v7("\238\82\161\84\249\68\175\111\242\67\162\84\234\86\171","\38\156\55\199")]=886 -(614 + 267) ,[v7("\188\114\123\47\31\113\209\70\177","\35\200\29\28\72\115\20\154")]=Enum.KeyCode.B,[v7("\28\172\193\236\132\54\49","\84\121\223\177\191\237\76")]=UDim2.new(32 -(19 + 13) ,11 + 189 ,0 + 0 ,1102 -(433 + 619) ),[v7("\190\69\217\134\53\94\36","\161\219\54\169\192\90\48\80")]=Enum.Font.SourceSansBold,[v7("\76\81\16\17\76\90\20\22\64\88\5","\69\41\34\96")]=179 -(92 + 71) ,[v7("\185\208\199\62\7\51\168\240\195\24\13\32\185\247\197\11\12\56\172\194\197\15\12\40\165","\75\220\163\183\106\98")]=0 + 0 ,[v7("\7\169\155\3\220\26\174\184\35\203\13\177\142\20\214\14\181\153","\185\98\218\235\87")]=Color3.new(0 + 0 ,0 -0 ,765 -(574 + 191) ),[v7("\204\41\46\192\204\171\198\57\20\239\196\175","\202\171\92\71\134\190")]=UDim2.new(0 + 0 ,626 -376 ,0 + 0 ,306 -156 ),[v7("\46\212\37\174\59\192\33\141\25\206\63\129\61\200\35\134","\232\73\161\76")]=UDim2.new(849.5 -(254 + 595) , -125,126.2 -(55 + 71) ,0 -0 ),[v7("\188\204\75\127\31\184\210\69\79\17\174\215\70\126\17\183\214\80","\126\219\185\34\61")]=Color3.fromRGB(1830 -(573 + 1217) ,94 -54 ,110 -70 ),[v7("\11\219\87\80\127\116\248\224\30\193\75\124\122\67\225\230\2\221\78\115\108\114\253\228\21","\135\108\174\62\18\30\23\147")]=0.1 + 0 ,[v7("\177\252\35\233\23\188\55\194\164\202\37\199\23\188","\167\214\137\74\171\120\206\83")]=Color3.fromRGB(0 + 0 ,255,255),[v7("\140\229\59\127\247\181\143\245\32\105\240\174\136\251\60\88\235\180","\199\235\144\82\61\152")]=6 -3 ,[v7("\0\3\176\31\14\2\181\46\36\25\181\36\21","\75\103\118\217")]=Color3.fromRGB(0 -0 ,255,1194 -(714 + 225) ),[v7("\192\65\121\54\172\10\211\91\126\55\182\18\200\70","\126\167\52\16\116\217")]=Color3.fromRGB(0 -0 ,209 -59 ,28 + 227 ),[v7("\207\59\41\180\187\30\251\196\43\15\142\151\22\240\199\60","\156\168\78\64\224\212\121")]=Color3.fromRGB(318 -98 ,856 -(118 + 688) ,50),[v7("\0\251\172\250\8\233\162\194\2\193\163\200\36\225\169\193\21","\174\103\142\197")]=Color3.fromRGB(160 -110 ,228 -(25 + 23) ,82 -32 ),[v7("\88\39\75\49\35\87\251\87\60\86\55\43\122\237\68\41\75\49\42\80","\152\54\72\63\88\69\62")]=1 + 2 ,[v7("\208\193\236\73\211\233\225\88\209","\60\180\164\142")]=false};local v12=false;local v13={};local v14={};local v15=nil;local v16=nil;local function v17(v31) local v32=1886 -(927 + 959) ;local v33;local v34;local v35;while true do if (v32==(3 -2)) then v35=nil;while true do if (v33==(1 + 0)) then local v230=732 -(16 + 716) ;while true do if (v230==(0 -0)) then v35=pcall(function() if v31:IsA(v7("\154\232\200\193\136\232\201\208","\164\216\137\187")) then v34=v31.Position;elseif (v31:IsA(v7("\255\233\53\183\170","\107\178\134\81\210\198\158")) or v31:IsA(v7("\12\1\141\202","\202\88\110\226\166")) or v31:IsA(v7("\226\12\129\242\217\208\0\144\238","\170\163\111\226\151"))) then v34=v31:GetPivot().Position;elseif v31.PrimaryPart then v34=v31.PrimaryPart.Position;else for v288,v289 in ipairs(v31:GetDescendants()) do if v289:IsA(v7("\51\49\161\61\126\54\59\5","\73\113\80\210\88\46\87")) then v34=v289.Position;break;end end end end);if ( not v35 or  not v34) then return v10.Position;end v230=1 -0 ;end if (v230==(98 -(11 + 86))) then v33=1285 -(1040 + 243) ;break;end end end if (v33==(0 -0)) then if ( not v31 or (typeof(v31)~=v7("\113\80\22\61\38\227\17\93","\114\56\62\101\73\71\141")) or  not v31:IsDescendantOf(game)) then return v10.Position;end v34=nil;v33=1848 -(559 + 1288) ;end if (v33==(287 -(175 + 110))) then return v34;end end break;end if (v32==(0 -0)) then v33=0;v34=nil;v32=4 -3 ;end end end local function v18(v36,v37) local v38=1796 -(503 + 1293) ;local v39;local v40;local v41;local v42;local v43;while true do if (v38==(5 -3)) then v41.Size=v11.espSize;v41.StudsOffset=Vector3.new(0,5 -3 ,0 + 0 );v41.Adornee=v36;v38=1064 -(810 + 251) ;end if (v38==(4 + 1)) then local v199=0 + 0 ;while true do if ((1 + 0)==v199) then v42.Font=v11.espFont;v38=6 + 0 ;break;end if (v199==(533 -(43 + 490))) then v42.TextStrokeTransparency=v11.espTextStrokeTransparency;v42.TextSize=v11.espTextSize;v199=734 -(711 + 22) ;end end end if (v38==1) then v41=Instance.new(v7("\163\37\193\30\229\142\45\223\22\192\148\37","\135\225\76\173\114"));v41.Name=v7("\51\249\189\189\137\142\151","\199\122\141\216\208\204\221");v41.AlwaysOnTop=true;v38=3 -1 ;end if (v38==(4 + 2)) then v42.TextScaled=false;v42.Parent=v41;v43=game:GetService(v7("\175\10\77\67\195\84\233","\128\236\101\63\38\132\33"));v38=26 -19 ;end if (v38==(866 -(240 + 619))) then pcall(function() v41.Parent=v43;end);table.insert(v13,v41);return v41,v42;end if (v38==(2 + 1)) then v42=Instance.new(v7("\153\216\8\228\84\247\175\216\28","\150\205\189\112\144\24"));v42.BackgroundTransparency=1 + 0 ;v42.Size=UDim2.new(1 + 0 ,0,1 -0 ,0 + 0 );v38=437 -(153 + 280) ;end if ((1744 -(1344 + 400))==v38) then if ( not v36 or  not v36:IsDescendantOf(game)) then return nil,nil;end v39=v17(v36);v40=(v10.Position-v39).Magnitude;v38=406 -(255 + 150) ;end if (v38==4) then local v207=0;while true do if (v207==(1 + 0)) then v42.TextStrokeColor3=v11.espTextStrokeColor;v38=3 + 2 ;break;end if (v207==(0 + 0)) then v42.Text=v37   .. v7("\101\191","\112\69\228\223\44\100\232\113")   .. math.floor(v40)   .. v7("\217\34","\230\180\127\103\179\214\28") ;v42.TextColor3=v11.espColor;v207=4 -3 ;end end end end end local function v19() local v44=0 -0 ;local v45;while true do if (v44==(3 -2)) then v45=668 -(89 + 578) ;while v45<= #v14  do local v215=1739 -(404 + 1335) ;local v216;while true do if (v215==(406 -(183 + 223))) then v216=v14[v45];if ( not v216 or  not v216.part or  not v216.part:IsDescendantOf(game) or  not v216.billboard or  not v216.billboard.Parent) then local v259=0 -0 ;while true do if (v259==(0 + 0)) then if (v216 and v216.billboard and v216.billboard.Parent) then v216.billboard:Destroy();end table.remove(v14,v45);break;end end else v45=v45 + 1 + 0 ;end break;end end end break;end if (v44==(337 -(10 + 327))) then v45=1 + 0 ;while v45<= #v13  do local v217=0 + 0 ;local v218;while true do if (v217==(338 -(118 + 220))) then v218=v13[v45];if ( not v218 or  not v218.Parent) then table.remove(v13,v45);else v45=v45 + 1 + 0 ;end break;end end end v44=450 -(108 + 341) ;end end end local function v20() if  not v12 then return {};end v19();local v46=0;local v47={};local v48={};for v163,v164 in ipairs(v14) do if (v164.part and v164.part:IsDescendantOf(game) and v164.billboard and v164.billboard.Parent) then local v208=0 + 0 ;local v209;while true do if ((4 -3)==v208) then if ( not v209 and v164.billboard) then pcall(function() v164.billboard:Destroy();end);end break;end if (v208==(0 + 0)) then local v242=1493 -(711 + 782) ;while true do if (v242==(0 -0)) then v209=false;for v270,v271 in ipairs(v11.targetNames) do if (v164.part.Name==v271) then local v276=v17(v164.part);local v277=(v10.Position-v276).Magnitude;if (v277<=v11.maxDistance) then v48[v164.part]=true;table.insert(v47,v164);v209=true;v46=v46 + (470 -(270 + 199)) ;break;end end end v242=1 + 0 ;end if ((1820 -(580 + 1239))==v242) then v208=2 -1 ;break;end end end end end end local function v49(v165) local v166=0 + 0 ;while true do if (v166==(0 + 0)) then if  not v12 then return;end for v223,v224 in pairs(v165:GetChildren()) do local v225=0;while true do if (v225==(0 + 0)) then if  not v12 then return;end for v260,v261 in ipairs(v11.targetNames) do if ((v224.Name==v261) and  not v48[v224]) then local v272=0 + 0 ;local v273;local v274;while true do if (v272==(2 -1)) then if (v274<=v11.maxDistance) then local v285=0 -0 ;local v286;local v287;while true do if (v285==(0 + 0)) then v46=v46 + (1168 -(645 + 522)) ;if v11.debugMode then print("Đã tìm thấy "   .. v224.Name   .. v7("\236\234","\175\204\201\113\36\214\139")   .. v46   .. " tại vị trí: "   .. tostring(v273)   .. " (Khoảng cách: "   .. math.floor(v274)   .. v7("\74\133","\100\39\172\85\188") );end v285=1791 -(1010 + 780) ;end if (v285==1) then v286,v287=v18(v224,v224.Name);if (v286 and v287) then local v291=0 + 0 ;while true do if (v291==(0 -0)) then v48[v224]=true;table.insert(v47,{[v7("\189\121\171\148","\83\205\24\217\224")]=v224,[v7("\228\204\193\49\228\202\204\47\226","\93\134\165\173")]=v286,[v7("\178\243\195\199\54","\30\222\146\161\162\90\174\210")]=v287,[v7("\233\79\99\30\213\65\99\3\241\71\127\4","\106\133\46\16")]=v273});break;end end end break;end end end break;end if ((0 + 0)==v272) then v273=v17(v224);v274=(v10.Position-v273).Magnitude;v272=1;end end end end v225=1;end if (v225==(2 -1)) then if ( #v224:GetChildren()>(0 -0)) then v49(v224);end break;end end end break;end end end pcall(function() v49(game.Workspace);end);if v11.debugMode then if (v46>(0 + 0)) then print("Đã tìm thấy tổng cộng "   .. v46   .. " vật phẩm phù hợp" );else print("Không tìm thấy vật phẩm nào phù hợp trong Workspace");end end return v47;end local function v21() if  not v12 then return;end v19();for v167,v168 in ipairs(v14) do if (v168.part and v168.part:IsDescendantOf(game) and v168.label and v168.label.Parent) then pcall(function() local v219=v17(v168.part);local v220=(v10.Position-v219).Magnitude;if (v220<=v11.maxDistance) then local v243=796 -(588 + 208) ;while true do if (v243==(1837 -(1045 + 791))) then v168.billboard.Enabled=true;break;end if (v243==(0 -0)) then v168.label.Text=v168.part.Name   .. v7("\24\27","\32\56\64\19\156\58")   .. math.floor(v220)   .. v7("\87\245","\224\58\168\133\54\58\146") ;v168.lastPosition=v219;v243=2 -1 ;end end else v168.billboard.Enabled=false;end end);end end end local function v22() if v15 then task.cancel(v15);v15=nil;end if v16 then local v189=0 -0 ;while true do if (v189==(505 -(351 + 154))) then task.cancel(v16);v16=nil;break;end end end for v169,v170 in ipairs(v13) do if (v170 and v170.Parent) then pcall(function() v170:Destroy();end);end end for v171,v172 in pairs(game:GetService(v7("\122\89\89\248\82\147\142","\107\57\54\43\157\21\230\231")):GetChildren()) do if (v172.Name==v7("\242\159\20\248\156\239\255","\175\187\235\113\149\217\188")) then pcall(function() v172:Destroy();end);end end v13={};v14={};if v11.debugMode then print("Đã dọn dẹp tất cả các đối tượng ESP");end end local function v23() if v12 then return;end v22();v12=true;v14=v20();pcall(function() game:GetService(v7("\15\187\128\94\247\124\106\27\186\136","\24\92\207\225\44\131\25")):SetCore(v7("\120\214\182\72\53\114\95\218\190\69\24\124\95\218\183\66","\29\43\179\216\44\123"),{[v7("\137\208\52\64\184","\44\221\185\64")]=v7("\36\212\120\31\90\21\226\69","\19\97\135\40\63"),[v7("\154\89\43\47","\81\206\60\83\91\79")]="Đã bật ESP cho "   .. table.concat(v11.targetNames,v7("\2\235","\196\46\203\176\18\79\163\45")) ,[v7("\156\55\108\31\48\242\224\182","\143\216\66\30\126\68\155")]=v11.notificationDuration});end);v15=task.spawn(function() while v12 do if v10 then pcall(function() v21();end);end task.wait(v11.updateInterval);end end);v16=task.spawn(function() while v12 do local v190=0 + 0 ;while true do if (v190==(653 -(232 + 421))) then if v10 then pcall(function() local v257=1574 -(1281 + 293) ;local v258;while true do if (v257==0) then v258=v20();if ( #v258>(266 -(28 + 238))) then v14=v258;end break;end end end);end task.wait(v11.refreshInterval);break;end end end end);end local function v24() if  not v12 then return;end v12=false;v22();pcall(function() game:GetService(v7("\153\220\12\217\209\166\197\198\191\193","\129\202\168\109\171\165\195\183")):SetCore(v7("\17\93\57\220\240\27\242\43\94\62\219\223\0\239\45\86","\134\66\56\87\184\190\116"),{[v7("\8\56\29\183\28","\85\92\81\105\219\121\139\65")]=v7("\216\128\96\5\85\203\248\190","\191\157\211\48\37\28"),[v7("\235\26\236\8","\90\191\127\148\124")]="Đã tắt ESP",[v7("\92\146\60\22\108\142\33\25","\119\24\231\78")]=v11.notificationDuration});end);end local function v25(v50) local v51=0;while true do if (v51==(2 -1)) then pcall(function() game:GetService(v7("\104\58\181\68\89\94\60\147\67\68","\45\59\78\212\54")):SetCore(v7("\35\83\141\143\168\33\185\249\22\95\128\138\146\39\162\254","\144\112\54\227\235\230\78\205"),{[v7("\135\33\27\240\213","\59\211\72\111\156\176")]=v7("\107\180\211\109\103\147\230\32","\77\46\231\131"),[v7("\142\81\174\84","\32\218\52\214")]="Đã đặt mục tiêu: "   .. table.concat(v11.targetNames,v7("\2\87","\58\46\119\81\200\145\208\37")) ,[v7("\15\153\34\173\189\180\57\37","\86\75\236\80\204\201\221")]=v11.notificationDuration});end);break;end if (v51==(0 + 0)) then if (type(v50)==v7("\145\57\183\67\210\71","\113\226\77\197\42\188\32")) then v11.targetNames={v50};elseif (type(v50)==v7("\46\23\246\185\63","\213\90\118\148")) then v11.targetNames=v50;end if v12 then local v227=0 + 0 ;while true do if (v227==(1 + 0)) then v23();break;end if (v227==(0 + 0)) then v24();task.wait(0.1 -0 );v227=3 -2 ;end end end v51=1 + 0 ;end end end local v26=game:GetService(v7("\71\82\114\151\215\133\98\84\99\182\251\153\100\72\116\128","\235\18\33\23\229\158"));v26.InputBegan:Connect(function(v52,v53) if  not v53 then if (v52.KeyCode==v11.toggleKey) then if v12 then v24();else v23();end end end end);v8.CharacterAdded:Connect(function(v54) v9=v54;v10=v9:WaitForChild(v7("\120\175\204\186\94\181\200\191\98\181\206\175\96\187\211\175","\219\48\218\161"));if v12 then local v191=425 -(360 + 65) ;while true do if (v191==1) then v23();break;end if (v191==(470 -(381 + 89))) then v24();task.wait(254.5 -(79 + 175) );v191=1 -0 ;end end else v22();end end);local function v27() if v11.debugMode then print("Đang tạo giao diện...");end local v55=v8.PlayerGui:FindFirstChild(v7("\193\66\76\106\212\65\244\246\126\112\110\238\102","\128\132\17\28\41\187\47"));if v55 then v55:Destroy();end local v56=Instance.new(v7("\50\49\20\63\88\15\21\19\51","\61\97\82\102\90"));v56.Name=v7("\137\29\155\104\200\89\10\27\163\34\140\126\238","\105\204\78\203\43\167\55\126");v56.ResetOnSpawn=false;v56.DisplayOrder=886 + 113 ;v56.IgnoreGuiInset=true;local v61=false;pcall(function() local v173=0 + 0 ;while true do if (v173==(1 -0)) then if v11.debugMode then print("Đã đặt GUI vào PlayerGui");end break;end if (v173==(1156 -(1074 + 82))) then v56.Parent=v8.PlayerGui;v61=true;v173=1 -0 ;end end end);if  not v61 then pcall(function() local v210=0;while true do if ((1785 -(214 + 1570))==v210) then if v11.debugMode then print("Đã đặt GUI vào CoreGui");end break;end if (v210==(1455 -(990 + 465))) then v56.Parent=game:GetService(v7("\134\165\49\27\52\17\206","\49\197\202\67\126\115\100\167"));v61=true;v210=1 + 0 ;end end end);end if  not v61 then pcall(function() local v211=0 + 0 ;local v212;while true do if (1==v211) then v61=true;if v11.debugMode then print("Đã đặt GUI vào StarterGui");end break;end if (v211==(0 + 0)) then v212=game:GetService(v7("\4\79\222\59\148\83\76\16\78\214","\62\87\59\191\73\224\54"));v56.Parent=v212;v211=3 -2 ;end end end);end local v62=Instance.new(v7("\193\16\251\196\226","\169\135\98\154"));v62.Name=v7("\230\118\45\90\219\33\201\198\114","\168\171\23\68\52\157\83");v62.Size=v11.guiFrameSize;v62.Position=v11.guiFramePosition;v62.BackgroundColor3=v11.guiBackgroundColor;v62.BackgroundTransparency=v11.guiBackgroundTransparency;v62.BorderSizePixel=v11.guiBorderThickness;v62.BorderColor3=v11.guiBorderColor;v62.Parent=v56;local v77=Instance.new(v7("\193\88\214\162\55\35\130\230","\231\148\17\149\205\69\77"));v77.CornerRadius=UDim.new(1726 -(1668 + 58) ,2 + 6 );v77.Parent=v62;local v80=Instance.new(v7("\181\142\244\239\69\240\139\162","\159\224\199\167\155\55"));v80.Color=Color3.fromRGB(0 -0 ,175 + 25 ,122 + 133 );v80.Thickness=628 -(512 + 114) ;v80.Parent=v62;local v84=Instance.new(v7("\195\246\36\198\219\242\62\215\251","\178\151\147\92"));v84.Name=v7("\184\244\88\62\23","\26\236\157\44\82\114\44");v84.Size=UDim2.new(1 + 0 ,0 -0 ,1244 -(485 + 759) ,72 -37 );v84.BackgroundColor3=Color3.fromRGB(34 -24 ,10,19 + 21 );v84.BackgroundTransparency=0.1 + 0 ;v84.TextColor3=v11.guiTitleColor;v84.Text=v7("\15\29\229\27\40\55\149\115\37\47\219\74\57\33\219\9\123\126\130","\59\74\78\181");v84.Font=Enum.Font.GothamBold;v84.TextSize=18 + 2 ;v84.Parent=v62;local v96=Instance.new(v7("\16\248\121\85\161\43\212\72","\211\69\177\58\58"));v96.CornerRadius=UDim.new(0 -0 ,3 + 5 );v96.Parent=v84;local v99=Instance.new(v7("\131\224\97\225\203\196\175","\171\215\133\25\149\137"));v99.Name=v7("\200\220\55\247\193\49\241\71\200\198\34\239\251","\34\129\168\82\154\143\80\156");v99.Size=UDim2.new(1994.9 -(109 + 1885) ,1469 -(1269 + 200) ,0 -0 ,845 -(98 + 717) );v99.Position=UDim2.new(826.05 -(802 + 24) ,0,0.37 -0 ,0 -0 );v99.BackgroundColor3=Color3.fromRGB(9 + 51 ,60,62 + 18 );v99.TextColor3=Color3.fromRGB(42 + 213 ,671 -416 ,56 + 199 );v99.PlaceholderText=v7("\172\166\54\6\8\64\136\136\183\115\67\75\65\132\136\179\115\24\77\94\136\151\179\39\14\76\7","\233\229\210\83\107\40\46");v99.PlaceholderColor3=Color3.fromRGB(1273 -(1036 + 37) ,556 -356 ,666 -466 );v99.Text=table.concat(v11.targetNames,v7("\141\2","\101\161\34\82\182"));v99.Font=Enum.Font.Gotham;v99.TextSize=14;v99.ClearTextOnFocus=false;v99.Parent=v62;local v113=Instance.new(v7("\221\36\122\241\201\236\135\60","\78\136\109\57\158\187\130\226"));v113.CornerRadius=UDim.new(0 + 0 ,5 + 1 );v113.Parent=v99;local v116=Instance.new(v7("\10\58\225\229\28\42\237\229\49\49","\145\94\95\153"));v116.Name=v7("\220\221\4\217\87\149\232\217\0\218\64","\215\157\173\116\181\46");v116.Size=UDim2.new(0.45 + 0 ,0 + 0 ,0 + 0 ,15 + 15 );v116.Position=UDim2.new(1433.03 -(797 + 636) ,0,0.68 -0 ,0);v116.BackgroundColor3=v11.guiButtonColor;v116.TextColor3=Color3.fromRGB(1874 -(1427 + 192) ,89 + 166 ,118 + 137 );v116.Text=v7("\20\164\155\254\195","\186\85\212\235\146");v116.Font=Enum.Font.GothamBold;v116.TextSize=37 -21 ;v116.Parent=v62;local v127=Instance.new(v7("\247\168\53\241\43\224\93\208","\56\162\225\118\158\89\142"));v127.CornerRadius=UDim.new(0 + 0 ,3 + 3 );v127.Parent=v116;local v130=Instance.new(v7("\104\0\216\187\0\205\72\17\207\161","\184\60\101\160\207\66"));v130.Name=v7("\5\141\123\187\61\135\94\169\37\150\115\178","\220\81\226\28");v130.Size=UDim2.new(326.45 -(192 + 134) ,1276 -(316 + 960) ,0,17 + 13 );v130.Position=UDim2.new(0.52,0 + 0 ,0.68 + 0 ,0 -0 );v130.BackgroundColor3=(v12 and v11.guiToggleOnColor) or v11.guiToggleOffColor ;v130.TextColor3=Color3.fromRGB(806 -(83 + 468) ,2061 -(1202 + 604) ,1190 -935 );v130.Text=(v12 and v7("\55\220\145\250\232\203\22\149\167\200\218","\167\115\181\226\155\138")) or v7("\199\44\230\94\119\116\134\199\17\215","\166\130\66\135\60\27\17") ;v130.Font=Enum.Font.GothamBold;v130.TextSize=26 -10 ;v130.Parent=v62;local v140=Instance.new(v7("\113\99\237\122\34\74\79\220","\80\36\42\174\21"));v140.CornerRadius=UDim.new(0 -0 ,331 -(45 + 280) );v140.Parent=v130;local v143=function(v174) game:GetService(v7("\122\7\50\127\64\35\50\104\88\25\52\127","\26\46\112\87")):Create(v116,TweenInfo.new(0.2 + 0 ,Enum.EasingStyle.Quad,Enum.EasingDirection.Out),{[v7("\155\34\168\127\184\173\74\161\183\39\136\123\179\176\87\231","\212\217\67\203\20\223\223\37")]=(v174 and Color3.fromRGB(0 + 0 ,74 + 126 ,142 + 113 )) or v11.guiButtonColor }):Play();end;v116.MouseEnter:Connect(function() v143(true);end);v116.MouseLeave:Connect(function() v143(false);end);local v144=function(v175) local v176=0 + 0 ;local v177;local v178;while true do if (v176==(0 -0)) then v177=(v12 and v11.guiToggleOnColor) or v11.guiToggleOffColor ;v178=(v12 and Color3.fromRGB(255,1981 -(340 + 1571) ,28 + 42 )) or Color3.fromRGB(1597 -(389 + 1138) ,1992 -(1733 + 39) ,70) ;v176=2 -1 ;end if (v176==(1035 -(125 + 909))) then game:GetService(v7("\142\154\173\215\180\190\173\192\172\132\171\215","\178\218\237\200")):Create(v130,TweenInfo.new(1948.2 -(1096 + 852) ,Enum.EasingStyle.Quad,Enum.EasingDirection.Out),{[v7("\148\180\229\219\177\167\233\197\184\177\197\223\186\186\244\131","\176\214\213\134")]=(v175 and v178) or v177 }):Play();break;end end end;v130.MouseEnter:Connect(function() v144(true);end);v130.MouseLeave:Connect(function() v144(false);end);local function v145(v179) game:GetService(v7("\192\186\179\209\166\101\92\230\187\191\215\173","\57\148\205\214\180\200\54")):Create(v179,TweenInfo.new(0.1 + 0 ,Enum.EasingStyle.Quad,Enum.EasingDirection.Out),{[v7("\33\244\47\49","\22\114\157\85\84")]=UDim2.new(v179.Size.X.Scale,v179.Size.X.Offset,0 -0 ,v179.Size.Y.Offset-(2 + 0) )}):Play();task.wait(512.1 -(409 + 103) );game:GetService(v7("\240\220\22\193\83\197\173\214\221\26\199\88","\200\164\171\115\164\61\150")):Create(v179,TweenInfo.new(236.1 -(46 + 190) ,Enum.EasingStyle.Quad,Enum.EasingDirection.Out),{[v7("\141\253\25\64","\227\222\148\99\37")]=UDim2.new(v179.Size.X.Scale,v179.Size.X.Offset,0 + 0 ,v179.Size.Y.Offset + (1466 -(157 + 1307)) )}):Play();end v116.MouseButton1Click:Connect(function() v145(v116);local v180=v99.Text;local v181={};v180=string.gsub(v180,v7("\8\108\23\225\188\127\23\65\203","\153\83\50\50\150"),"");for v192 in string.gmatch(v180,v7("\102\72\63\33\56","\45\61\22\19\124\19\203")) do local v193=0;local v194;while true do if (v193==1) then if (v192 and (v192~="")) then table.insert(v181,v192);end break;end if (v193==(95 -(51 + 44))) then local v228=0 + 0 ;local v229;while true do if ((0 -0)==v228) then v229=1317 -(1114 + 203) ;while true do if ((1 -0)==v229) then v193=727 -(228 + 498) ;break;end if ((0 -0)==v229) then v194=string.match(v192,v7("\255\87\30\191\74\62\244\136\87\30\191\70","\217\161\114\109\149\98\16"));v192=v194 or v192 ;v229=1027 -(834 + 192) ;end end break;end end end end end if ( #v181>(0 + 0)) then v25(v181);end end);v130.MouseButton1Click:Connect(function() local v182=0 + 0 ;while true do if (v182==(0 + 0)) then v145(v130);if v12 then local v247=663 -(174 + 489) ;local v248;while true do if (v247==0) then v248=0 -0 ;while true do if (v248==(1 -0)) then v130.Text=v7("\55\46\57\126\176\113\82\5\11\76","\20\114\64\88\28\220");break;end if (v248==(1905 -(830 + 1075))) then v24();v130.BackgroundColor3=v11.guiToggleOffColor;v248=1;end end break;end end else local v249=524 -(303 + 221) ;while true do if (v249==(1 + 0)) then v130.Text=v7("\21\8\193\181\250\220\184\113\36\225\132","\221\81\97\178\212\152\176");break;end if (v249==(1269 -(231 + 1038))) then v23();v130.BackgroundColor3=v11.guiToggleOnColor;v249=1 + 0 ;end end end break;end end end);local v146=Instance.new(v7("\249\226\5\239\54\204\229\24\247","\122\173\135\125\155"));v146.Name=v7("\175\196\25\144\49\55\199","\168\228\161\96\217\95\81");v146.Size=UDim2.new(363 -(112 + 250) ,1162 -(171 + 991) ,0 -0 ,53 -33 );v146.Position=UDim2.new(0 -0 ,0 + 0 ,0.9 -0 ,0 -0 );v146.BackgroundTransparency=1 -0 ;v146.TextColor3=Color3.fromRGB(100 + 100 ,149 + 51 ,1614 -(1001 + 413) );v146.Text="Phím tắt: "   .. v11.toggleKey.Name ;v146.Font=Enum.Font.Gotham;v146.TextSize=12;v146.Parent=v62;local v156=false;local v157;local v158;local v159;local function v160(v183) local v184=v183.Position-v158 ;local v185=UDim2.new(v159.X.Scale,v159.X.Offset + v184.X ,v159.Y.Scale,v159.Y.Offset + v184.Y );game:GetService(v7("\239\198\43\89\33\100\222\195\56\85\44\82","\55\187\177\78\60\79")):Create(v62,TweenInfo.new(0.1 -0 ,Enum.EasingStyle.Quad,Enum.EasingDirection.Out),{[v7("\29\193\76\226\82\198\143\35","\224\77\174\63\139\38\175")]=v185}):Play();end v84.InputBegan:Connect(function(v186) if ((v186.UserInputType==Enum.UserInputType.MouseButton1) or (v186.UserInputType==Enum.UserInputType.Touch)) then local v213=882 -(244 + 638) ;while true do if (v213==(6 -4)) then v80.Thickness=1251 -(111 + 1137) ;v186.Changed:Connect(function() if (v186.UserInputState==Enum.UserInputState.End) then v156=false;v80.Color=Color3.fromRGB(158 -(91 + 67) ,595 -395 ,64 + 191 );v80.Thickness=525 -(423 + 100) ;end end);break;end if (v213==(1 + 0)) then v159=v62.Position;v80.Color=Color3.fromRGB(717 -(373 + 344) ,116 + 139 ,705 -450 );v213=2 + 0 ;end if (v213==(771 -(326 + 445))) then v156=true;v158=v186.Position;v213=1;end end end end);v84.InputChanged:Connect(function(v187) if ((v187.UserInputType==Enum.UserInputType.MouseMovement) or (v187.UserInputType==Enum.UserInputType.Touch)) then v157=v187;end end);v26.InputChanged:Connect(function(v188) if ((v188==v157) and v156) then v160(v188);end end);end game:GetService(v7("\180\77\89\55\129\83\75","\78\228\33\56")).PlayerRemoving:Connect(function(v161) if (v161==v8) then v22();end end);script.Destroying:Connect(function() v22();end);v27();
+    -- Cấu hình GUI
+    guiFrameSize = UDim2.new(0, 250, 0, 280), -- Kích thước khung GUI (tăng chiều cao để chứa thêm nút)
+    guiFramePosition = UDim2.new(0.5, -125, 0.2, 0), -- Vị trí ban đầu của GUI
+    guiBackgroundColor = Color3.fromRGB(40, 40, 40), -- Màu nền của GUI
+    guiBackgroundTransparency = 0.1, -- Độ trong suốt nền GUI
+    guiBorderColor = Color3.fromRGB(0, 255, 255), -- Màu viền GUI
+    guiBorderThickness = 3, -- Độ dày viền GUI
+    guiTitleColor = Color3.fromRGB(0, 255, 255), -- Màu chữ tiêu đề
+    guiButtonColor = Color3.fromRGB(0, 150, 255), -- Màu nút Áp dụng
+    guiToggleOnColor = Color3.fromRGB(46, 204, 113), -- Màu nút Bật/Tắt khi bật (xanh lá)
+    guiToggleOffColor = Color3.fromRGB(231, 76, 60), -- Màu nút Bật/Tắt khi tắt (đỏ)
+
+    -- Cấu hình nút ẩn/hiện menu
+    miniButtonSize = UDim2.new(0, 50, 0, 50), -- Kích thước nút nhỏ
+    miniButtonPosition = UDim2.new(0, 20, 0, 20), -- Vị trí nút nhỏ
+    miniButtonColor = Color3.fromRGB(40, 40, 40), -- Màu nền nút
+    miniButtonBackgroundTransparency = 0.1, -- Độ trong suốt nền nút
+    miniButtonTextColor = Color3.fromRGB(0, 200, 255), -- Màu biểu tượng trên nút nhỏ
+    miniButtonText = "ESP", -- Văn bản hiển thị trên nút nhỏ
+    miniButtonTextSize = 10, -- Kích thước chữ cho nút nhỏ
+    miniButtonToggleKey = Enum.KeyCode.RightControl, -- Phím để hiện lại menu khi đã ẩn
+
+    -- Cấu hình thông báo
+    notificationDuration = 3, -- Thời gian hiển thị thông báo (giây)
+    showNotifications = false, -- Có hiển thị thông báo hay không
+
+    -- Cấu hình đi bộ tự động
+    walkSpeed = 20, -- Tốc độ đi bộ (studs/giây)
+    walkStopDistance = 3, -- Khoảng cách dừng lại với item (studs)
+    walkUpdateRate = 0.1, -- Tần suất cập nhật đường đi (giây)
+    originalWalkSpeed = nil, -- Tốc độ đi bộ ban đầu của nhân vật (sẽ được lưu khi kích hoạt)
+    walkPathColor = Color3.fromRGB(255, 255, 0), -- Màu đường đi (vàng)
+    showWalkPath = false, -- Hiển thị đường đi khi đang di chuyển
+    continuousWalk = false, -- Tiếp tục đi đến vật phẩm tiếp theo sau khi đến hoặc vật phẩm biến mất
+    autoStopWalk = false, -- Tự động dừng khi đến gần vật phẩm
+    walkRetryInterval = 1, -- Thời gian thử lại đi bộ nếu bị gián đoạn (giây)
+    maxWalkRetries = 10, -- Số lần thử lại tối đa
+
+    -- Cấu hình toggle mới
+    toggleWidth = 60, -- Chiều rộng nút toggle
+    toggleHeight = 25, -- Chiều cao nút toggle
+    toggleCircleSize = 19, -- Kích thước vòng tròn di chuyển
+    toggleOffsetX = 7, -- Khoảng cách từ lề
+
+    -- Cấu hình animation
+    animationSpeed = 0.3, -- Tốc độ animation cho UI
+
+    -- Cấu hình Noclip (Mới)
+    noclipToggleKey = Enum.KeyCode.N, -- Phím để bật/tắt noclip
+
+    -- Cấu hình Auto-Interact (Mới)
+    interactKey = Enum.KeyCode.E, -- Phím tương tác mặc định
+    interactToggleKey = Enum.KeyCode.G, -- Phím để bật/tắt tự động tương tác
+    interactInterval = 0.1, -- Khoảng thời gian giữa các lần tương tác (giây)
+    interactDistance = 3, -- Khoảng cách tối đa để tương tác (studs)
+
+    -- Chế độ debug
+    debugMode = false -- Bật/tắt chế độ debug (in thông tin chi tiết)
+}
+
+-- Biến toàn cục
+local espEnabled = false -- Bắt đầu với ESP tắt
+local allESPObjects = {}
+local foundItems = {}
+local updateTask = nil
+local refreshTask = nil
+local gui = nil
+local miniButton = nil
+local miniButtonGui = nil
+local guiVisible = true -- Bắt đầu với GUI hiển thị
+local isWalking = false -- Trạng thái đi bộ
+local walkTask = nil
+local walkPath = nil -- Đối tượng hiển thị đường đi
+local currentTargetItem = nil -- Item hiện đang hướng đến
+local walkRetryCount = 0 -- Số lần đã thử lại đi bộ
+local walkRetryTask = nil -- Task thử lại đi bộ
+
+-- Biến toàn cục mới
+local noclipEnabled = false -- Trạng thái noclip
+local noclipConnection = nil -- Connection cho noclip
+local autoInteractEnabled = false -- Trạng thái tự động tương tác
+local autoInteractConnection = nil -- Connection cho auto interact
+
+-- Khai báo hàm để sử dụng trước
+local stopWalking
+local walkToNearestItem
+local getNearestItem
+local toggleMainGUI
+local createMiniButton
+local toggleNoclip
+local toggleAutoInteract
+local showNotification
+local addTargetName
+
+-- Tạo màu ngẫu nhiên
+local function getRandomColor()
+    local r = math.random(0, 255)
+    local g = math.random(0, 255)
+    local b = math.random(0, 255)
+    return Color3.fromRGB(r, g, b)
+end
+
+-- Lấy màu cho item (giữ nguyên màu nếu đã có, tạo màu mới nếu chưa)
+local function getItemColor(itemName)
+    if not CONFIG.useRandomColors then
+        return CONFIG.espColor
+    end
+
+    if not CONFIG.itemColors[itemName] then
+        CONFIG.itemColors[itemName] = getRandomColor()
+    end
+
+    return CONFIG.itemColors[itemName]
+end
+
+-- Hàm an toàn để lấy vị trí của một đối tượng
+local function safeGetPosition(object)
+    if not object or typeof(object) ~= "Instance" or not object:IsDescendantOf(game) then
+        return hrp.Position
+    end
+
+    local position = nil
+    local success = pcall(function()
+        if object:IsA("BasePart") then
+            position = object.Position
+        elseif object:IsA("Model") or object:IsA("Tool") or object:IsA("Accessory") then
+            position = object:GetPivot().Position
+        elseif object.PrimaryPart then
+            position = object.PrimaryPart.Position
+        else
+            for _, child in ipairs(object:GetDescendants()) do
+                if child:IsA("BasePart") then
+                    position = child.Position
+                    break
+                end
+            end
+        end
+    end)
+
+    if not success or not position then
+        return hrp.Position
+    end
+
+    return position
+end
+
+-- Tạo ESP để định vị
+local function createESP(part, name)
+    if not part or not part:IsDescendantOf(game) then return nil, nil end
+
+    local position = safeGetPosition(part)
+    local distance = (hrp.Position - position).Magnitude
+
+    local billboard = Instance.new("BillboardGui")
+    billboard.Name = "ItemESP"
+    billboard.AlwaysOnTop = true
+    billboard.Size = CONFIG.espSize
+    billboard.StudsOffset = Vector3.new(0, 2, 0)
+    billboard.Adornee = part
+
+    local label = Instance.new("TextLabel")
+    label.BackgroundTransparency = 1
+    label.Size = UDim2.new(1, 0, 1, 0)
+    label.Text = name .. " [" .. math.floor(distance) .. "m]"
+    label.TextColor3 = getItemColor(name)
+    label.TextStrokeColor3 = CONFIG.espTextStrokeColor
+    label.TextStrokeTransparency = CONFIG.espTextStrokeTransparency
+    label.TextSize = CONFIG.espTextSize
+    label.Font = CONFIG.espFont
+    label.TextScaled = false
+    label.Parent = billboard
+
+    local parent = game:GetService("CoreGui")
+    pcall(function()
+        billboard.Parent = parent
+    end)
+
+    table.insert(allESPObjects, billboard)
+
+    return billboard, label
+end
+
+-- Hàm kiểm tra và cập nhật các esp objects
+local function updateESPObjects()
+    -- Kiểm tra và xóa các ESP không hợp lệ
+    local i = 1
+    while i <= #allESPObjects do
+        local object = allESPObjects[i]
+        if not object or not object.Parent then
+            table.remove(allESPObjects, i)
+        else
+            i = i + 1
+        end
+    end
+
+    -- Kiểm tra và xóa các item không hợp lệ
+    i = 1
+    while i <= #foundItems do
+        local item = foundItems[i]
+        if not item or not item.part or not item.part:IsDescendantOf(game) or not item.billboard or not item.billboard.Parent then
+            if item and item.billboard and item.billboard.Parent then
+                item.billboard:Destroy()
+            end
+
+            -- Kiểm tra nếu đây là vật phẩm đang hướng đến
+            if currentTargetItem and currentTargetItem == item then
+                currentTargetItem = nil
+
+                -- Nếu đang đi và cấu hình cho phép, tìm vật phẩm tiếp theo
+                if isWalking and CONFIG.continuousWalk then
+                    task.spawn(function()
+                        task.wait(0.5) -- Chờ một chút trước khi tìm vật phẩm mới
+                        walkToNearestItem(true) -- Tìm và đi đến vật phẩm mới
+                    end)
+                end
+            end
+
+            table.remove(foundItems, i)
+        else
+            i = i + 1
+        end
+    end
+end
+
+-- Tìm tất cả items phù hợp
+local function findItems()
+    if not espEnabled then return {} end
+
+    updateESPObjects() -- Dọn dẹp trước khi tìm kiếm mới
+
+    local count = 0
+    local newItems = {}
+    local foundItemsMap = {} -- Dùng để theo dõi các item đã tìm thấy
+
+    -- Kiểm tra các items đã có và giữ lại nếu còn tồn tại
+    for _, item in ipairs(foundItems) do
+        if item.part and item.part:IsDescendantOf(game) and item.billboard and item.billboard.Parent then
+            local keep = false
+            for _, targetName in ipairs(CONFIG.targetNames) do
+                if item.part.Name == targetName then
+                    local position = safeGetPosition(item.part)
+                    local distance = (hrp.Position - position).Magnitude
+
+                    if distance <= CONFIG.maxDistance then
+                        foundItemsMap[item.part] = true
+                        table.insert(newItems, item)
+                        keep = true
+                        count = count + 1
+                        break
+                    end
+                end
+            end
+
+            if not keep and item.billboard then
+                pcall(function() item.billboard:Destroy() end)
+            end
+        end
+    end
+
+    local function searchInModel(model)
+        if not espEnabled then return end -- Thoát nếu ESP đã tắt
+
+        for _, v in pairs(model:GetChildren()) do
+            -- Ngắt tìm kiếm nếu ESP bị tắt giữa chừng
+            if not espEnabled then return end
+
+            -- Kiểm tra nếu đối tượng này phù hợp với một trong các tên mục tiêu
+            for _, targetName in ipairs(CONFIG.targetNames) do
+                if v.Name == targetName and not foundItemsMap[v] then
+                    local position = safeGetPosition(v)
+                    local distance = (hrp.Position - position).Magnitude
+
+                    if distance <= CONFIG.maxDistance then
+                        count = count + 1
+                        if CONFIG.debugMode then
+                            print("Đã tìm thấy " .. v.Name .. " #" .. count .. " tại vị trí: " .. tostring(position) .. " (Khoảng cách: " .. math.floor(distance) .. "m)")
+                        end
+
+                        local billboard, label = createESP(v, v.Name)
+                        if billboard and label then
+                            foundItemsMap[v] = true
+                            table.insert(newItems, {
+                                part = v,
+                                billboard = billboard,
+                                label = label,
+                                lastPosition = position
+                            })
+                        end
+                    end
+                end
+            end
+
+            -- Tìm kiếm đệ quy trong các con của mô hình này
+            if #v:GetChildren() > 0 then
+                searchInModel(v)
+            end
+        end
+    end
+
+    pcall(function()
+        searchInModel(game.Workspace)
+    end)
+
+    if CONFIG.debugMode then
+        if count > 0 then
+            print("Đã tìm thấy tổng cộng " .. count .. " vật phẩm phù hợp")
+        else
+            print("Không tìm thấy vật phẩm nào phù hợp")
+        end
+    end
+
+    foundItems = newItems
+    return newItems
+end
+
+-- Cập nhật thông tin khoảng cách trên ESP
+local function updateDistances()
+    if not espEnabled then return end
+
+    for _, item in ipairs(foundItems) do
+        if item.part and item.part:IsDescendantOf(game) and item.billboard and item.billboard.Parent and item.label then
+            local position = safeGetPosition(item.part)
+            local distance = (hrp.Position - position).Magnitude
+
+            pcall(function()
+                item.label.Text = item.part.Name .. " [" .. math.floor(distance) .. "m]"
+                item.lastPosition = position
+            end)
+        end
+    end
+end
+
+-- Tạo thông báo
+showNotification = function(message, duration)
+    if not CONFIG.showNotifications then return end
+
+    duration = duration or CONFIG.notificationDuration
+
+    local notifGui = Instance.new("ScreenGui")
+    notifGui.Name = "ESPNotification"
+    notifGui.ResetOnSpawn = false
+    notifGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+
+    pcall(function()
+        notifGui.Parent = game:GetService("CoreGui")
+    end)
+
+    local notifFrame = Instance.new("Frame")
+    notifFrame.Name = "NotificationFrame"
+    notifFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+    notifFrame.BorderColor3 = CONFIG.espColor
+    notifFrame.BorderSizePixel = 2
+    notifFrame.Position = UDim2.new(0.5, -150, 0.8, 0)
+    notifFrame.Size = UDim2.new(0, 300, 0, 50)
+    notifFrame.Parent = notifGui
+
+    local corner = Instance.new("UICorner")
+    corner.CornerRadius = UDim.new(0, 5)
+    corner.Parent = notifFrame
+
+    local notifText = Instance.new("TextLabel")
+    notifText.Name = "NotificationText"
+    notifText.BackgroundTransparency = 1
+    notifText.Size = UDim2.new(1, 0, 1, 0)
+    notifText.Font = CONFIG.espFont
+    notifText.TextColor3 = Color3.new(1, 1, 1)
+    notifText.TextSize = 16
+    notifText.Text = message
+    notifText.Parent = notifFrame
+
+    -- Animation
+    notifFrame.Position = UDim2.new(0.5, -150, 1, 10)
+    game:GetService("TweenService"):Create(
+        notifFrame,
+        TweenInfo.new(0.3, Enum.EasingStyle.Quint, Enum.EasingDirection.Out),
+        {Position = UDim2.new(0.5, -150, 0.8, 0)}
+    ):Play()
+
+    task.spawn(function()
+        task.wait(duration)
+
+        if notifFrame and notifFrame.Parent then
+            local fadeTween = game:GetService("TweenService"):Create(
+                notifFrame,
+                TweenInfo.new(0.3, Enum.EasingStyle.Quint, Enum.EasingDirection.Out),
+                {Position = UDim2.new(0.5, -150, 1, 10)}
+            )
+            fadeTween:Play()
+
+            fadeTween.Completed:Wait()
+            notifGui:Destroy()
+        end
+    end)
+end
+
+-- Thêm tên vật phẩm để tìm kiếm
+addTargetName = function(name)
+    if not name or name == "" then
+        showNotification("Vui lòng nhập tên vật phẩm cần tìm", 2)
+        return false
+    end
+
+    -- Kiểm tra nếu tên đã tồn tại
+    for _, existingName in ipairs(CONFIG.targetNames) do
+        if existingName == name then
+            showNotification("Vật phẩm '" .. name .. "' đã có trong danh sách", 2)
+            return false
+        end
+    end
+
+    -- Thêm vào danh sách
+    table.insert(CONFIG.targetNames, name)
+
+    -- Cập nhật danh sách trong GUI nếu đang mở
+    if gui then
+        local targetList = gui:FindFirstChild("TargetList", true)
+        if targetList then
+            local newItem = Instance.new("TextLabel")
+            newItem.Name = name .. "Item"
+            newItem.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+            newItem.Size = UDim2.new(1, -10, 0, 25)
+            newItem.Text = name
+            newItem.TextColor3 = getItemColor(name)
+            newItem.Font = Enum.Font.SourceSans
+            newItem.TextSize = 14
+            newItem.Parent = targetList
+
+            -- Nút xóa
+            local removeButton = Instance.new("TextButton")
+            removeButton.Name = "RemoveButton"
+            removeButton.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
+            removeButton.Position = UDim2.new(1, -25, 0, 2)
+            removeButton.Size = UDim2.new(0, 20, 0, 20)
+            removeButton.Text = "X"
+            removeButton.TextColor3 = Color3.new(1, 1, 1)
+            removeButton.Font = Enum.Font.SourceSansBold
+            removeButton.TextSize = 14
+            removeButton.Parent = newItem
+
+            local buttonCorner = Instance.new("UICorner")
+            buttonCorner.CornerRadius = UDim.new(0, 4)
+            buttonCorner.Parent = removeButton
+
+            removeButton.MouseButton1Click:Connect(function()
+                -- Xóa vật phẩm khỏi danh sách
+                for i, targetName in ipairs(CONFIG.targetNames) do
+                    if targetName == name then
+                        table.remove(CONFIG.targetNames, i)
+                        break
+                    end
+                end
+
+                -- Xóa khỏi GUI
+                newItem:Destroy()
+
+                showNotification("Đã xóa vật phẩm '" .. name .. "' khỏi danh sách", 2)
+            end)
+
+            -- Cập nhật kích thước canvas
+            local targetListLayout = targetList:FindFirstChildOfClass("UIListLayout")
+            if targetListLayout then
+                targetList.CanvasSize = UDim2.new(0, 0, 0, targetListLayout.AbsoluteContentSize.Y + 10)
+            end
+        end
+    end
+
+    showNotification("Đã thêm vật phẩm '" .. name .. "' vào danh sách tìm kiếm", 2)
+    return true
+end
+
+-- Đoạn này để bật/tắt ESP
+local function toggleESP()
+    espEnabled = not espEnabled
+
+    if espEnabled then
+        -- Bật ESP
+        if not refreshTask then
+            refreshTask = task.spawn(function()
+                while espEnabled do
+                    findItems()
+                    task.wait(CONFIG.refreshInterval)
+                end
+            end)
+        end
+
+        if not updateTask then
+            updateTask = task.spawn(function()
+                while espEnabled do
+                    updateDistances()
+                    task.wait(CONFIG.updateInterval)
+                end
+            end)
+        end
+
+        showNotification("ESP đã được kích hoạt", 2)
+    else
+        -- Dừng các task đang chạy
+        if refreshTask then
+            task.cancel(refreshTask)
+            refreshTask = nil
+        end
+
+        if updateTask then
+            task.cancel(updateTask)
+            updateTask = nil
+        end
+
+        -- Xóa tất cả ESP objects
+        for _, obj in ipairs(allESPObjects) do
+            pcall(function()
+                obj:Destroy()
+            end)
+        end
+        allESPObjects = {}
+        foundItems = {}
+
+        showNotification("ESP đã được tắt", 2)
+    end
+
+    -- Cập nhật trạng thái toggle trong GUI
+    if gui then
+        local espToggle = gui:FindFirstChild("ESPToggle", true)
+        if espToggle then
+            local circle = espToggle:FindFirstChild("Circle")
+            if circle then
+                -- Animation cho toggle
+                local targetPos = espEnabled 
+                    and UDim2.new(1, -CONFIG.toggleCircleSize - CONFIG.toggleOffsetX, 0.5, 0)
+                    or UDim2.new(0, CONFIG.toggleOffsetX, 0.5, 0)
+
+                local targetColor = espEnabled and CONFIG.guiToggleOnColor or CONFIG.guiToggleOffColor
+
+                -- Tween cho vòng tròn
+                local posTween = game:GetService("TweenService"):Create(
+                    circle,
+                    TweenInfo.new(CONFIG.animationSpeed, Enum.EasingStyle.Quint),
+                    {Position = targetPos}
+                )
+
+                -- Tween cho nền
+                local colorTween = game:GetService("TweenService"):Create(
+                    espToggle,
+                    TweenInfo.new(CONFIG.animationSpeed, Enum.EasingStyle.Quint),
+                    {BackgroundColor3 = targetColor}
+                )
+
+                posTween:Play()
+                colorTween:Play()
+            end
+        end
+    end
+end
+
+-- Lấy item gần nhất
+getNearestItem = function()
+    local nearestDistance = math.huge
+    local nearestItem = nil
+
+    for _, item in ipairs(foundItems) do
+        if item.part and item.part:IsDescendantOf(game) then
+            local position = safeGetPosition(item.part)
+            local distance = (hrp.Position - position).Magnitude
+
+            if distance < nearestDistance then
+                nearestDistance = distance
+                nearestItem = item
+            end
+        end
+    end
+
+    return nearestItem, nearestDistance
+end
+
+-- Dừng việc đi bộ tự động
+stopWalking = function()
+    isWalking = false
+    currentTargetItem = nil
+
+    if walkTask then
+        task.cancel(walkTask)
+        walkTask = nil
+    end
+
+    if walkRetryTask then
+        task.cancel(walkRetryTask)
+        walkRetryTask = nil
+    end
+
+    -- Xóa đường đi nếu có
+    if walkPath then
+        pcall(function() walkPath:Destroy() end)
+        walkPath = nil
+    end
+
+    -- Khôi phục tốc độ đi ban đầu
+    if CONFIG.originalWalkSpeed and humanoid then
+        humanoid.WalkSpeed = CONFIG.originalWalkSpeed
+        CONFIG.originalWalkSpeed = nil
+    end
+
+    -- Dừng nhân vật
+    if humanoid then
+        humanoid:MoveTo(hrp.Position)
+    end
+
+    -- Cập nhật trạng thái nút trong GUI
+    if gui then
+        local walkButton = gui:FindFirstChild("WalkButton")
+        if walkButton then
+            -- Animation cho nút đi bộ
+            local colorTween = game:GetService("TweenService"):Create(
+                walkButton,
+                TweenInfo.new(CONFIG.animationSpeed, Enum.EasingStyle.Quint),
+                {BackgroundColor3 = CONFIG.guiButtonColor}
+            )
+
+            colorTween:Play()
+            walkButton.Text = "Đi đến Gần nhất"
+        end
+    end
+
+    showNotification("Đã dừng đi bộ tự động", 2)
+end
+
+-- Thêm biến để theo dõi item bỏ qua
+local ignoredItems = {}
+
+-- Đi bộ đến vật phẩm gần nhất - sử dụng MoveTo của Roblox
+walkToNearestItem = function(fromContinuous)
+    if not fromContinuous then
+        isWalking = not isWalking
+        if not isWalking then
+            stopWalking()
+            return
+        end
+    end
+
+    -- Kiểm tra nếu ESP đang bật
+    if not espEnabled then
+        showNotification("Hãy bật ESP trước khi đi đến vật phẩm", 2)
+        return
+    end
+
+    -- Tìm vật phẩm gần nhất mà không nằm trong danh sách bỏ qua
+    local nearestItem, distance = nil, math.huge
+
+    for _, item in ipairs(foundItems) do
+        if item.part and item.part:IsDescendantOf(game) then
+            -- Kiểm tra xem item có trong danh sách bỏ qua không
+            local isIgnored = false
+            for _, ignoredItem in ipairs(ignoredItems) do
+                if ignoredItem == item.part then
+                    isIgnored = true
+                    break
+                end
+            end
+
+            if not isIgnored then
+                local position = safeGetPosition(item.part)
+                local itemDistance = (hrp.Position - position).Magnitude
+
+                if itemDistance < distance then
+                    distance = itemDistance
+                    nearestItem = item
+                end
+            end
+        end
+    end
+
+    if not nearestItem then
+        showNotification("Không tìm thấy vật phẩm nào gần đây hoặc tất cả đã bị bỏ qua", 2)
+        return
+    end
+
+    -- Đánh dấu trạng thái đi bộ
+    isWalking = true
+    currentTargetItem = nearestItem
+    walkRetryCount = 0
+
+    -- Lưu tốc độ đi ban đầu
+    if not CONFIG.originalWalkSpeed then
+        CONFIG.originalWalkSpeed = humanoid.WalkSpeed
+    end
+
+    -- Thiết lập tốc độ đi mới
+    humanoid.WalkSpeed = CONFIG.walkSpeed
+
+    -- Cập nhật trạng thái toggle trong GUI
+    if gui then
+        local walkToggle = gui:FindFirstChild("WalkToggle", true)
+        if walkToggle then
+            local circle = walkToggle:FindFirstChild("Circle")
+            if circle then
+                -- Animation cho toggle
+                local targetPos = UDim2.new(1, -CONFIG.toggleCircleSize - CONFIG.toggleOffsetX, 0.5, 0)
+                local targetColor = CONFIG.guiToggleOnColor
+
+                -- Tween cho vòng tròn
+                local posTween = game:GetService("TweenService"):Create(
+                    circle,
+                    TweenInfo.new(CONFIG.animationSpeed, Enum.EasingStyle.Quint),
+                    {Position = targetPos}
+                )
+
+                -- Tween cho nền
+                local colorTween = game:GetService("TweenService"):Create(
+                    walkToggle,
+                    TweenInfo.new(CONFIG.animationSpeed, Enum.EasingStyle.Quint),
+                    {BackgroundColor3 = targetColor}
+                )
+
+                posTween:Play()
+                colorTween:Play()
+            end
+        end
+    end
+
+    -- Tạo đường đi nếu cấu hình cho phép
+    if CONFIG.showWalkPath then
+        if walkPath then
+            pcall(function() walkPath:Destroy() end)
+        end
+
+        walkPath = Instance.new("Part")
+        walkPath.Name = "WalkPath"
+        walkPath.Anchored = true
+        walkPath.CanCollide = false
+        walkPath.Size = Vector3.new(0.2, 0.2, distance)
+        walkPath.Material = Enum.Material.Neon
+        walkPath.Color = CONFIG.walkPathColor
+        walkPath.Transparency = 0.3
+
+        local position = safeGetPosition(nearestItem.part)
+        walkPath.CFrame = CFrame.new(
+            hrp.Position + Vector3.new(0, -2, 0), 
+            position + Vector3.new(0, -2, 0)
+        )
+
+        pcall(function()
+            walkPath.Parent = game.Workspace
+        end)
+    end
+
+    -- Tạo nút bỏ qua
+    if currentTargetItem and currentTargetItem.part then
+        local ignoreButton = createIgnoreButton(currentTargetItem.part)
+    end
+
+    -- Hiển thị thông báo
+    showNotification("Đang đi đến " .. nearestItem.part.Name .. " (" .. math.floor(distance) .. "m)", 2)
+
+    -- Cách đi bộ tự nhiên của Roblox - dùng MoveTo
+    walkTask = task.spawn(function()
+        local MovingState = Enum.HumanoidStateType.Running
+
+        while isWalking and currentTargetItem and currentTargetItem.part and currentTargetItem.part:IsDescendantOf(game) do
+            local itemPosition = safeGetPosition(currentTargetItem.part)
+            local currentDistance = (hrp.Position - itemPosition).Magnitude
+
+            -- Cập nhật đường đi nếu hiển thị
+            if CONFIG.showWalkPath and walkPath then
+                pcall(function()
+                    walkPath.Size = Vector3.new(0.2, 0.2, currentDistance)
+                    walkPath.CFrame = CFrame.new(
+                        hrp.Position + Vector3.new(0, -2, 0), 
+                        itemPosition + Vector3.new(0, -2, 0)
+                    )
+                end)
+            end
+
+            -- Kiểm tra nếu đã đến đủ gần hoặc khoảng cách là 0
+            if currentDistance <= CONFIG.walkStopDistance or currentDistance == 0 then
+                showNotification("Đã đến " .. currentTargetItem.part.Name, 2)
+                if CONFIG.autoStopWalk then
+                    stopWalking()
+                    break
+                end
+            end
+
+            -- Sử dụng Humanoid.MoveTo để di chuyển
+            if humanoid and itemPosition then
+                humanoid:MoveTo(itemPosition)
+
+                -- Chờ một khoảng thời gian 
+                task.wait(CONFIG.walkUpdateRate)
+
+                -- Kiểm tra lại khoảng cách
+                local newDistance = (hrp.Position - itemPosition).Magnitude
+
+                -- Nếu không di chuyển được (bị kẹt), thử tìm đường khác
+                if math.abs(currentDistance - newDistance) < 0.1 and 
+                   newDistance > CONFIG.walkStopDistance then
+                    -- Thử một vị trí gần đó
+                    local direction = (itemPosition - hrp.Position).Unit
+                    local targetPosition = hrp.Position + direction * 5
+                    humanoid:MoveTo(targetPosition)
+                    task.wait(CONFIG.walkUpdateRate)
+                end
+            else
+                -- Nếu humanoid không tồn tại, dừng đi bộ
+                stopWalking()
+                break
+            end
+        end
+
+        -- Kiểm tra nếu vật phẩm biến mất
+        if isWalking and not (currentTargetItem and currentTargetItem.part and currentTargetItem.part:IsDescendantOf(game)) then
+            showNotification("Vật phẩm không còn tồn tại, dừng đi bộ", 2)
+            stopWalking()
+        end
+    end)
+end
+
+-- Hàm dừng di chuyển
+stopWalking = function()
+    isWalking = false
+    currentTargetItem = nil
+
+    if walkTask then
+        task.cancel(walkTask)
+        walkTask = nil
+    end
+
+    if walkRetryTask then
+        task.cancel(walkRetryTask)
+        walkRetryTask = nil
+    end
+
+    -- Xóa đường đi nếu có
+    if walkPath then
+        pcall(function() walkPath:Destroy() end)
+        walkPath = nil
+    end
+
+    -- Xóa nút bỏ qua nếu có
+    local ignoreGui = game:GetService("CoreGui"):FindFirstChild("IgnoreButtonGui")
+    if ignoreGui then
+        ignoreGui:Destroy()
+    end
+
+    -- Khôi phục tốc độ đi ban đầu
+    if CONFIG.originalWalkSpeed and humanoid then
+        humanoid.WalkSpeed = CONFIG.originalWalkSpeed
+        CONFIG.originalWalkSpeed = nil
+    end
+
+    -- Dừng nhân vật
+    if humanoid then
+        humanoid:MoveTo(hrp.Position)
+    end
+    -- Cập nhật trạng thái toggle trong GUI
+    if gui then
+        local walkToggle = gui:FindFirstChild("WalkToggle", true)
+        if walkToggle then
+            local circle = walkToggle:FindFirstChild("Circle")
+            if circle then
+                -- Animation cho toggle
+                local targetPos = UDim2.new(0, CONFIG.toggleOffsetX, 0.5, 0)
+                local targetColor = CONFIG.guiToggleOffColor
+
+                -- Tween cho vòng tròn
+                local posTween = game:GetService("TweenService"):Create(
+                    circle,
+                    TweenInfo.new(CONFIG.animationSpeed, Enum.EasingStyle.Quint),
+                    {Position = targetPos}
+                )
+
+                -- Tween cho nền
+                local colorTween = game:GetService("TweenService"):Create(
+                    walkToggle,
+                    TweenInfo.new(CONFIG.animationSpeed, Enum.EasingStyle.Quint),
+                    {BackgroundColor3 = targetColor}
+                )
+
+                posTween:Play()
+                colorTween:Play()
+            end
+        end
+    end
+
+    showNotification("Đã dừng đi bộ tự động", 2)
+end
+
+-- Tạo nút bỏ qua cho item đang hướng đến
+createIgnoreButton = function(itemPart)
+    -- Hủy nút cũ nếu có
+    local existingGui = game:GetService("CoreGui"):FindFirstChild("IgnoreButtonGui")
+    if existingGui then
+        existingGui:Destroy()
+    end
+
+    local ignoreGui = Instance.new("ScreenGui")
+    ignoreGui.Name = "IgnoreButtonGui"
+    ignoreGui.ResetOnSpawn = false
+    ignoreGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+
+    pcall(function()
+        ignoreGui.Parent = game:GetService("CoreGui")
+    end)
+
+    local ignoreFrame = Instance.new("Frame")
+    ignoreFrame.Name = "IgnoreFrame"
+    ignoreFrame.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+    ignoreFrame.BorderSizePixel = 0
+    ignoreFrame.Position = UDim2.new(0.5, -100, 0.7, 0)
+    ignoreFrame.Size = UDim2.new(0, 200, 0, 40)
+    ignoreFrame.Parent = ignoreGui
+
+    local frameCorner = Instance.new("UICorner")
+    frameCorner.CornerRadius = UDim.new(0, 8)
+    frameCorner.Parent = ignoreFrame
+
+    local ignoreButton = Instance.new("TextButton")
+    ignoreButton.Name = "IgnoreButton"
+    ignoreButton.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
+    ignoreButton.Position = UDim2.new(0.5, -80, 0.5, -15)
+    ignoreButton.Size = UDim2.new(0, 160, 0, 30)
+    ignoreButton.Font = Enum.Font.SourceSansBold
+    ignoreButton.Text = "Bỏ qua item này"
+    ignoreButton.TextColor3 = Color3.new(1, 1, 1)
+    ignoreButton.TextSize = 14
+    ignoreButton.Parent = ignoreFrame
+
+    local buttonCorner = Instance.new("UICorner")
+    buttonCorner.CornerRadius = UDim.new(0, 6)
+    buttonCorner.Parent = ignoreButton
+
+    ignoreButton.MouseButton1Click:Connect(function()
+        -- Thêm vào danh sách bỏ qua
+        table.insert(ignoredItems, itemPart)
+
+        -- Hiển thị thông báo
+        showNotification("Đã bỏ qua item " .. itemPart.Name, 2)
+
+        -- Dừng di chuyển hiện tại
+        stopWalking()
+
+        -- Tìm item khác để đi đến
+        task.spawn(function()
+            task.wait(0.5)
+            walkToNearestItem(true)
+        end)
+
+        -- Xóa GUI
+        ignoreGui:Destroy()
+    end)
+
+    return ignoreGui
+end
+
+-- Thêm chức năng để xóa danh sách bỏ qua
+clearIgnoredItems = function()
+    ignoredItems = {}
+    showNotification("Đã xóa danh sách item bỏ qua", 2)
+end
+
+-- Bật/tắt noclip
+toggleNoclip = function()
+    noclipEnabled = not noclipEnabled
+
+    if noclipEnabled then
+        -- Bật noclip
+        if noclipConnection then
+            noclipConnection:Disconnect()
+        end
+
+        noclipConnection = game:GetService("RunService").Stepped:Connect(function()
+            if character and character:IsDescendantOf(game) then
+                for _, part in pairs(character:GetDescendants()) do
+                    if part:IsA("BasePart") and part.CanCollide then
+                        part.CanCollide = false
+                    end
+                end
+            else
+                -- Nhân vật không còn tồn tại, hủy noclip
+                if noclipConnection then
+                    noclipConnection:Disconnect()
+                    noclipConnection = nil
+                    noclipEnabled = false
+                    showNotification("NoClip đã tắt (nhân vật không tồn tại)", 2)
+                    return
+                end
+            end
+        end)
+
+        showNotification("NoClip đã bật", 2)
+    else
+        -- Tắt noclip
+        if noclipConnection then
+            noclipConnection:Disconnect()
+            noclipConnection = nil
+        end
+
+        -- Khôi phục CanCollide cho tất cả các phần
+        for _, part in pairs(character:GetDescendants()) do
+            if part:IsA("BasePart") then
+                if part.Name == "HumanoidRootPart" then
+                    part.CanCollide = false
+                else
+                    part.CanCollide = true
+                end
+            end
+        end
+
+        showNotification("NoClip đã tắt", 2)
+    end
+
+    -- Cập nhật trạng thái toggle trong GUI
+    if gui then
+        local noclipToggle = gui:FindFirstChild("NoclipToggle", true)
+        if noclipToggle then
+            local circle = noclipToggle:FindFirstChild("Circle")
+            if circle then
+                -- Animation cho toggle
+                local targetPos = noclipEnabled 
+                    and UDim2.new(1, -CONFIG.toggleCircleSize - CONFIG.toggleOffsetX, 0.5, 0)
+                    or UDim2.new(0, CONFIG.toggleOffsetX, 0.5, 0)
+
+                local targetColor = noclipEnabled and CONFIG.guiToggleOnColor or CONFIG.guiToggleOffColor
+
+                -- Tween cho vòng tròn
+                local posTween = game:GetService("TweenService"):Create(
+                    circle,
+                    TweenInfo.new(CONFIG.animationSpeed, Enum.EasingStyle.Quint),
+                    {Position = targetPos}
+                )
+
+                -- Tween cho nền
+                local colorTween = game:GetService("TweenService"):Create(
+                    noclipToggle,
+                    TweenInfo.new(CONFIG.animationSpeed, Enum.EasingStyle.Quint),
+                    {BackgroundColor3 = targetColor}
+                )
+
+                posTween:Play()
+                colorTween:Play()
+            end
+        end
+    end
+end
+
+-- Bật/tắt tự động tương tác
+toggleAutoInteract = function()
+    autoInteractEnabled = not autoInteractEnabled
+
+    if autoInteractEnabled then
+        -- Bật tự động tương tác
+        if autoInteractConnection then
+            autoInteractConnection:Disconnect()
+        end
+
+        autoInteractConnection = game:GetService("RunService").Heartbeat:Connect(function()
+            -- Tìm vật phẩm gần nhất
+            local nearestItem, distance = getNearestItem()
+
+            if nearestItem and distance <= CONFIG.interactDistance then
+                -- Giả lập nhấn phím tương tác
+                game:GetService("VirtualInputManager"):SendKeyEvent(true, CONFIG.interactKey, false, game)
+                task.wait(0.1)
+                game:GetService("VirtualInputManager"):SendKeyEvent(false, CONFIG.interactKey, false, game)
+            end
+
+            task.wait(CONFIG.interactInterval)
+        end)
+
+        showNotification("Tự động tương tác đã bật", 2)
+    else
+        -- Tắt tự động tương tác
+        if autoInteractConnection then
+            autoInteractConnection:Disconnect()
+            autoInteractConnection = nil
+        end
+
+        showNotification("Tự động tương tác đã tắt", 2)
+    end
+
+    -- Cập nhật trạng thái toggle trong GUI
+    if gui then
+        local autoInteractToggle = gui:FindFirstChild("AutoInteractToggle", true)
+        if autoInteractToggle then
+            local circle = autoInteractToggle:FindFirstChild("Circle")
+            if circle then
+                -- Animation cho toggle
+                local targetPos = autoInteractEnabled 
+                    and UDim2.new(1, -CONFIG.toggleCircleSize - CONFIG.toggleOffsetX, 0.5, 0)
+                    or UDim2.new(0, CONFIG.toggleOffsetX, 0.5, 0)
+
+                local targetColor = autoInteractEnabled and CONFIG.guiToggleOnColor or CONFIG.guiToggleOffColor
+
+                -- Tween cho vòng tròn
+                local posTween = game:GetService("TweenService"):Create(
+                    circle,
+                    TweenInfo.new(CONFIG.animationSpeed, Enum.EasingStyle.Quint),
+                    {Position = targetPos}
+                )
+
+                -- Tween cho nền
+                local colorTween = game:GetService("TweenService"):Create(
+                    autoInteractToggle,
+                    TweenInfo.new(CONFIG.animationSpeed, Enum.EasingStyle.Quint),
+                    {BackgroundColor3 = targetColor}
+                )
+
+                posTween:Play()
+                colorTween:Play()
+            end
+        end
+    end
+end
+
+-- Tạo nút toggle kiểu slide với vòng tròn bên trong
+local function createToggleSwitch(parent, position, toggled, clickHandler)
+    -- Tạo khung chứa nút toggle
+    local toggleButton = Instance.new("Frame")
+    toggleButton.Name = "ToggleButton"
+    toggleButton.Size = UDim2.new(0, CONFIG.toggleWidth, 0, CONFIG.toggleHeight)
+    toggleButton.Position = position
+    toggleButton.BackgroundColor3 = toggled and CONFIG.guiToggleOnColor or CONFIG.guiToggleOffColor
+    toggleButton.Parent = parent
+
+    -- Bo tròn các góc của toggle
+    local toggleCorner = Instance.new("UICorner")
+    toggleCorner.CornerRadius = UDim.new(1, 0) -- Làm tròn tối đa
+    toggleCorner.Parent = toggleButton
+
+    -- Tạo vòng tròn di chuyển
+    local circle = Instance.new("Frame")
+    circle.Name = "Circle"
+    circle.Size = UDim2.new(0, CONFIG.toggleCircleSize, 0, CONFIG.toggleCircleSize)
+    circle.AnchorPoint = Vector2.new(0, 0.5)
+
+    -- Đặt vị trí vòng tròn tùy theo trạng thái
+    if toggled then
+        circle.Position = UDim2.new(1, -CONFIG.toggleCircleSize - CONFIG.toggleOffsetX, 0.5, 0)
+    else
+        circle.Position = UDim2.new(0, CONFIG.toggleOffsetX, 0.5, 0)
+    end
+
+    circle.BackgroundColor3 = Color3.fromRGB(0, 0, 0) -- Màu đen cho vòng tròn
+    circle.Parent = toggleButton
+
+    -- Bo tròn vòng tròn
+    local circleCorner = Instance.new("UICorner")
+    circleCorner.CornerRadius = UDim.new(1, 0)
+    circleCorner.Parent = circle
+
+    -- Phát hiện sự kiện click
+    local button = Instance.new("TextButton")
+    button.BackgroundTransparency = 1
+    button.Text = ""
+    button.Size = UDim2.new(1, 0, 1, 0)
+    button.Parent = toggleButton
+
+    button.MouseButton1Click:Connect(function()
+        clickHandler()
+    end)
+
+    -- Trả về đối tượng toggle để có thể gắn tên
+    return toggleButton
+end
+
+-- Hàm tạo menu item (nhãn + nút toggle)
+local function createMenuItem(parent, text, toggled, clickHandler)
+    local itemContainer = Instance.new("Frame")
+    itemContainer.Name = "MenuItem"
+    itemContainer.BackgroundTransparency = 1
+    itemContainer.Size = UDim2.new(1, -10, 0, 30)
+    itemContainer.Parent = parent
+
+    local itemLabel = Instance.new("TextLabel")
+    itemLabel.Name = "ItemLabel"
+    itemLabel.BackgroundTransparency = 1
+    itemLabel.Position = UDim2.new(0, 10, 0, 0)
+    itemLabel.Size = UDim2.new(0.7, -10, 1, 0)
+    itemLabel.Font = Enum.Font.SourceSans
+    itemLabel.Text = text
+    itemLabel.TextColor3 = Color3.new(1, 1, 1)
+    itemLabel.TextSize = 14
+    itemLabel.TextXAlignment = Enum.TextXAlignment.Left
+    itemLabel.Parent = itemContainer
+
+    local toggleButton = createToggleSwitch(
+        itemContainer,
+        UDim2.new(1, -CONFIG.toggleWidth - 10, 0.5, -CONFIG.toggleHeight/2),
+        toggled,
+        clickHandler
+    )
+
+    return itemContainer, toggleButton
+end
+
+-- Tạo GUI chính
+local function createMainGUI()
+    -- Xóa GUI cũ nếu có
+    if gui then
+        gui:Destroy()
+    end
+
+    -- Tạo ScreenGui mới
+    gui = Instance.new("ScreenGui")
+    gui.Name = "ESPGUI"
+    gui.ResetOnSpawn = false
+    gui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+
+    pcall(function()
+        gui.Parent = game:GetService("CoreGui")
+    end)
+
+    -- Container chính
+    local mainFrame = Instance.new("Frame")
+    mainFrame.Name = "MainFrame"
+    mainFrame.BackgroundColor3 = Color3.fromRGB(15, 15, 15) -- Màu nền đen tối hơn
+    mainFrame.BorderSizePixel = 0
+    mainFrame.Position = UDim2.new(0.5, -200, 0.5, -175) -- Căn giữa màn hình
+    mainFrame.Size = UDim2.new(0, 400, 0, 350) -- Kích thước to hơn
+    mainFrame.Active = true
+    mainFrame.Draggable = true -- Cho phép kéo thả
+    mainFrame.Parent = gui
+
+    -- Hiệu ứng bo tròn góc
+    local cornerFrame = Instance.new("UICorner")
+    cornerFrame.CornerRadius = UDim.new(0, 8)
+    cornerFrame.Parent = mainFrame
+
+    -- Thanh tiêu đề
+    local titleBar = Instance.new("Frame")
+    titleBar.Name = "TitleBar"
+    titleBar.BackgroundColor3 = Color3.fromRGB(25, 25, 25) -- Màu tối hơn cho thanh tiêu đề
+    titleBar.Size = UDim2.new(1, 0, 0, 35)
+    titleBar.BorderSizePixel = 0
+    titleBar.Parent = mainFrame
+
+    -- Hiệu ứng bo tròn góc cho thanh tiêu đề
+    local cornerTitle = Instance.new("UICorner")
+    cornerTitle.CornerRadius = UDim.new(0, 8)
+    cornerTitle.Parent = titleBar
+
+    -- Tiêu đề
+    local titleLabel = Instance.new("TextLabel")
+    titleLabel.Name = "TitleLabel"
+    titleLabel.BackgroundTransparency = 1
+    titleLabel.Position = UDim2.new(0, 10, 0, 0)
+    titleLabel.Size = UDim2.new(0.7, 0, 1, 0)
+    titleLabel.Font = Enum.Font.GothamBold
+    titleLabel.Text = "ESP Main v4"
+    titleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+    titleLabel.TextSize = 16
+    titleLabel.TextXAlignment = Enum.TextXAlignment.Left
+    titleLabel.Parent = titleBar
+
+    -- Nút đóng
+    local closeButton = Instance.new("TextButton")
+    closeButton.Name = "CloseButton"
+    closeButton.BackgroundTransparency = 1
+    closeButton.Position = UDim2.new(1, -35, 0, 0)
+    closeButton.Size = UDim2.new(0, 35, 0, 35)
+    closeButton.Font = Enum.Font.GothamBold
+    closeButton.Text = "X"
+    closeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+    closeButton.TextSize = 16
+    closeButton.Parent = titleBar
+
+    -- Sự kiện nút đóng
+    closeButton.MouseButton1Click:Connect(function()
+        toggleMainGUI()
+    end)
+
+    -- Container nội dung
+    local content = Instance.new("ScrollingFrame")
+    content.Name = "Content"
+    content.BackgroundTransparency = 1
+    content.Position = UDim2.new(0, 0, 0, 35)
+    content.Size = UDim2.new(1, 0, 1, -35)
+    content.CanvasSize = UDim2.new(0, 0, 0, 0) -- Sẽ được điều chỉnh sau
+    content.ScrollBarThickness = 4
+    content.ScrollBarImageColor3 = Color3.fromRGB(80, 80, 80)
+    content.BorderSizePixel = 0
+    content.Parent = mainFrame
+
+    -- Layout cho nội dung
+    local contentLayout = Instance.new("UIListLayout")
+    contentLayout.Padding = UDim.new(0, 5)
+    contentLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
+    contentLayout.Parent = content
+
+    -- Tạo các panel
+    -- Panel ESP
+    local espPanel = Instance.new("Frame")
+    espPanel.Name = "ESPPanel"
+    espPanel.BackgroundColor3 = Color3.fromRGB(30, 30, 30) -- Màu tối hơn
+    espPanel.BorderSizePixel = 0
+    espPanel.Size = UDim2.new(1, -20, 0, 220) -- Tăng chiều cao
+    espPanel.Parent = content
+
+    -- Hiệu ứng bo tròn góc cho panel
+    local cornerPanel = Instance.new("UICorner")
+    cornerPanel.CornerRadius = UDim.new(0, 8)
+    cornerPanel.Parent = espPanel
+
+    -- Tiêu đề panel
+    local panelTitle = Instance.new("TextLabel")
+    panelTitle.Name = "PanelTitle"
+    panelTitle.BackgroundColor3 = Color3.fromRGB(50, 50, 50) -- Màu tối hơn cho tiêu đề panel
+    panelTitle.Size = UDim2.new(1, 0, 0, 30)
+    panelTitle.BorderSizePixel = 0
+    panelTitle.Font = Enum.Font.GothamSemibold
+    panelTitle.Text = "Chức năng UI"
+    panelTitle.TextColor3 = Color3.fromRGB(255, 255, 255)
+    panelTitle.TextSize = 14
+    panelTitle.Parent = espPanel
+
+    -- Hiệu ứng bo tròn góc cho tiêu đề panel
+    local cornerPanelTitle = Instance.new("UICorner")
+    cornerPanelTitle.CornerRadius = UDim.new(0, 8)
+    cornerPanelTitle.Parent = panelTitle
+
+    -- Nội dung ESP
+    local espContent = Instance.new("Frame")
+    espContent.Name = "ESPContent"
+    espContent.BackgroundTransparency = 1
+    espContent.Position = UDim2.new(0, 0, 0, 30)
+    espContent.Size = UDim2.new(1, 0, 1, -30)
+    espContent.Parent = espPanel
+
+    -- Layout cho nội dung ESP
+    local espLayout = Instance.new("UIListLayout")
+    espLayout.Padding = UDim.new(0, 10)
+    espLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
+    espLayout.Parent = espContent
+
+    -- ESP Toggle
+    local espItem, espToggle = createMenuItem(espContent, "ESP", espEnabled, function()
+        toggleESP()
+    end)
+    espToggle.Name = "ESPToggle"
+
+    -- Noclip Toggle
+    local noclipItem, noclipToggle = createMenuItem(espContent, "NoClip", noclipEnabled, function()
+        toggleNoclip()
+    end)
+    noclipToggle.Name = "NoclipToggle"
+
+    -- Đi bộ tự động (kiểu toggle switch)
+    local walkItem, walkToggle = createMenuItem(espContent, "Tự động đi đến item", isWalking, function()
+        walkToNearestItem()
+    end)
+    walkToggle.Name = "WalkToggle"
+
+    -- Tự động tương tác Toggle
+    local autoInteractItem, autoInteractToggle = createMenuItem(espContent, "Tự động tương tác", autoInteractEnabled, function()
+        toggleAutoInteract()
+    end)
+    autoInteractToggle.Name = "AutoInteractToggle"
+
+    -- Nút xóa danh sách bỏ qua
+    local clearIgnoredButton = Instance.new("TextButton")
+    clearIgnoredButton.Name = "ClearIgnoredButton"
+    clearIgnoredButton.BackgroundColor3 = Color3.fromRGB(70, 70, 70)
+    clearIgnoredButton.Size = UDim2.new(0.9, 0, 0, 30)
+    clearIgnoredButton.Position = UDim2.new(0.05, 0, 0, 180)
+    clearIgnoredButton.Font = Enum.Font.SourceSansBold
+    clearIgnoredButton.Text = "Xóa danh sách bỏ qua"
+    clearIgnoredButton.TextColor3 = Color3.new(1, 1, 1)
+    clearIgnoredButton.TextSize = 14
+    clearIgnoredButton.Parent = espPanel
+
+    local clearButtonCorner = Instance.new("UICorner")
+    clearButtonCorner.CornerRadius = UDim.new(0, 5)
+    clearButtonCorner.Parent = clearIgnoredButton
+
+    clearIgnoredButton.MouseButton1Click:Connect(function()
+        clearIgnoredItems()
+    end)
+
+    -- Panel thêm vật phẩm
+    local addItemPanel = Instance.new("Frame")
+    addItemPanel.Name = "AddItemPanel"
+    addItemPanel.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+    addItemPanel.BorderSizePixel = 0
+    addItemPanel.Size = UDim2.new(1, -20, 0, 250)
+    addItemPanel.Parent = content
+
+    -- Hiệu ứng bo tròn góc cho panel
+    local cornerAddPanel = Instance.new("UICorner")
+    cornerAddPanel.CornerRadius = UDim.new(0, 8)
+    cornerAddPanel.Parent = addItemPanel
+
+    -- Tiêu đề panel
+    local addPanelTitle = Instance.new("TextLabel")
+    addPanelTitle.Name = "PanelTitle"
+    addPanelTitle.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+    addPanelTitle.Size = UDim2.new(1, 0, 0, 30)
+    addPanelTitle.BorderSizePixel = 0
+    addPanelTitle.Font = Enum.Font.GothamSemibold
+    addPanelTitle.Text = "Quản lý vật phẩm tìm kiếm"
+    addPanelTitle.TextColor3 = Color3.fromRGB(255, 255, 255)
+    addPanelTitle.TextSize = 14
+    addPanelTitle.Parent = addItemPanel
+
+    -- Hiệu ứng bo tròn góc cho tiêu đề panel
+    local cornerAddPanelTitle = Instance.new("UICorner")
+    cornerAddPanelTitle.CornerRadius = UDim.new(0, 8)
+    cornerAddPanelTitle.Parent = addPanelTitle
+
+    -- Nội dung thêm vật phẩm
+    local addItemContent = Instance.new("Frame")
+    addItemContent.Name = "AddItemContent"
+    addItemContent.BackgroundTransparency = 1
+    addItemContent.Position = UDim2.new(0, 0, 0, 30)
+    addItemContent.Size = UDim2.new(1, 0, 0, 60)
+    addItemContent.Parent = addItemPanel
+
+    -- Textbox nhập tên vật phẩm
+    local itemNameInput = Instance.new("TextBox")
+    itemNameInput.Name = "ItemNameInput"
+    itemNameInput.PlaceholderText = "Nhập tên vật phẩm cần tìm..."
+    itemNameInput.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+    itemNameInput.Position = UDim2.new(0, 10, 0, 10)
+    itemNameInput.Size = UDim2.new(1, -130, 0, 30)
+    itemNameInput.Font = Enum.Font.SourceSans
+    itemNameInput.TextColor3 = Color3.new(1, 1, 1)
+    itemNameInput.TextSize = 14
+    itemNameInput.ClearTextOnFocus = false
+    itemNameInput.Parent = addItemContent
+
+    local inputCorner = Instance.new("UICorner")
+    inputCorner.CornerRadius = UDim.new(0, 5)
+    inputCorner.Parent = itemNameInput
+
+    -- Nút thêm vật phẩm
+    local addButton = Instance.new("TextButton")
+    addButton.Name = "AddButton"
+    addButton.BackgroundColor3 = CONFIG.guiButtonColor
+    addButton.Position = UDim2.new(1, -110, 0, 10)
+    addButton.Size = UDim2.new(0, 100, 0, 30)
+    addButton.Font = Enum.Font.SourceSansBold
+    addButton.Text = "Thêm"
+    addButton.TextColor3 = Color3.new(1, 1, 1)
+    addButton.TextSize = 14
+    addButton.Parent = addItemContent
+
+    local addButtonCorner = Instance.new("UICorner")
+    addButtonCorner.CornerRadius = UDim.new(0, 5)
+    addButtonCorner.Parent = addButton
+
+    addButton.MouseButton1Click:Connect(function()
+        local name = itemNameInput.Text
+        if addTargetName(name) then
+            itemNameInput.Text = ""
+        end
+    end)
+
+    -- Danh sách vật phẩm
+    local targetListLabel = Instance.new("TextLabel")
+    targetListLabel.Name = "TargetListLabel"
+    targetListLabel.BackgroundTransparency = 1
+    targetListLabel.Position = UDim2.new(0, 10, 0, 60)
+    targetListLabel.Size = UDim2.new(1, -20, 0, 20)
+    targetListLabel.Font = Enum.Font.SourceSansBold
+    targetListLabel.Text = "Danh sách vật phẩm đang tìm kiếm:"
+    targetListLabel.TextColor3 = Color3.new(1, 1, 1)
+    targetListLabel.TextSize = 14
+    targetListLabel.TextXAlignment = Enum.TextXAlignment.Left
+    targetListLabel.Parent = addItemPanel
+
+    local targetList = Instance.new("ScrollingFrame")
+    targetList.Name = "TargetList"
+    targetList.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+    targetList.Position = UDim2.new(0, 10, 0, 85)
+    targetList.Size = UDim2.new(1, -20, 0, 150)
+    targetList.CanvasSize = UDim2.new(0, 0, 0, 0)
+    targetList.ScrollBarThickness = 4
+    targetList.Parent = addItemPanel
+
+    local targetListCorner = Instance.new("UICorner")
+    targetListCorner.CornerRadius = UDim.new(0, 5)
+    targetListCorner.Parent = targetList
+
+    -- Layout cho danh sách
+    local targetListLayout = Instance.new("UIListLayout")
+    targetListLayout.Padding = UDim.new(0, 5)
+    targetListLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
+    targetListLayout.Parent = targetList
+
+    -- Thêm các mục đã có vào danh sách
+    for _, name in ipairs(CONFIG.targetNames) do
+        local newItem = Instance.new("TextLabel")
+        newItem.Name = name .. "Item"
+        newItem.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+        newItem.Size = UDim2.new(1, -10, 0, 25)
+        newItem.Text = name
+        newItem.TextColor3 = getItemColor(name)
+        newItem.Font = Enum.Font.SourceSans
+        newItem.TextSize = 14
+        newItem.Parent = targetList
+
+        -- Nút xóa
+        local removeButton = Instance.new("TextButton")
+        removeButton.Name = "RemoveButton"
+        removeButton.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
+        removeButton.Position = UDim2.new(1, -25, 0, 2)
+        removeButton.Size = UDim2.new(0, 20, 0, 20)
+        removeButton.Text = "X"
+        removeButton.TextColor3 = Color3.new(1, 1, 1)
+        removeButton.Font = Enum.Font.SourceSansBold
+        removeButton.TextSize = 14
+        removeButton.Parent = newItem
+
+        local buttonCorner = Instance.new("UICorner")
+        buttonCorner.CornerRadius = UDim.new(0, 4)
+        buttonCorner.Parent = removeButton
+
+        removeButton.MouseButton1Click:Connect(function()
+            -- Xóa vật phẩm khỏi danh sách
+            for i, targetName in ipairs(CONFIG.targetNames) do
+                if targetName == name then
+                    table.remove(CONFIG.targetNames, i)
+                    break
+                end
+            end
+
+            -- Xóa khỏi GUI
+            newItem:Destroy()
+
+            showNotification("Đã xóa vật phẩm '" .. name .. "' khỏi danh sách", 2)
+        end)
+    end
+
+
+
+    -- Cập nhật kích thước canvas
+    targetList.CanvasSize = UDim2.new(0, 0, 0, targetListLayout.AbsoluteContentSize.Y + 10)
+
+    -- Điều chỉnh CanvasSize dựa trên nội dung
+    content.CanvasSize = UDim2.new(0, 0, 0, contentLayout.AbsoluteContentSize.Y + 50)
+
+    return gui
+end
+
+-- Tạo nút nhỏ để hiện/ẩn menu chính
+createMiniButton = function()
+    if miniButtonGui then
+        miniButtonGui:Destroy()
+    end
+
+    miniButtonGui = Instance.new("ScreenGui")
+    miniButtonGui.Name = "ESPMiniButton"
+    miniButtonGui.ResetOnSpawn = false
+    miniButtonGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+
+    pcall(function()
+        miniButtonGui.Parent = game:GetService("CoreGui")
+    end)
+
+    miniButton = Instance.new("TextButton")
+    miniButton.Name = "MiniButton"
+    miniButton.Size = CONFIG.miniButtonSize
+    miniButton.Position = CONFIG.miniButtonPosition
+    miniButton.BackgroundColor3 = CONFIG.miniButtonColor
+    miniButton.BackgroundTransparency = CONFIG.miniButtonBackgroundTransparency
+    miniButton.Text = CONFIG.miniButtonText
+    miniButton.TextColor3 = CONFIG.miniButtonTextColor
+    miniButton.Font = Enum.Font.SourceSansBold
+    miniButton.TextSize = CONFIG.miniButtonTextSize
+    miniButton.Parent = miniButtonGui
+
+    local corner = Instance.new("UICorner")
+    corner.CornerRadius = UDim.new(0.5, 0) -- Nút tròn
+    corner.Parent = miniButton
+
+    miniButton.MouseButton1Click:Connect(function()
+        toggleMainGUI()
+    end)
+
+    return miniButton
+end
+
+-- Chuyển đổi hiển thị của menu chính
+toggleMainGUI = function()
+    guiVisible = not guiVisible
+
+    if gui then
+        if guiVisible then
+            -- Animation mở - scale từ nhỏ đến to
+            gui.Enabled = true
+            local mainFrame = gui:FindFirstChild("MainFrame")
+            if mainFrame then
+                mainFrame.Size = UDim2.new(0, 0, 0, 0)
+                mainFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
+                local sizeTween = game:GetService("TweenService"):Create(
+                    mainFrame,
+                    TweenInfo.new(CONFIG.animationSpeed, Enum.EasingStyle.Back, Enum.EasingDirection.Out),
+                    {
+                        Size = UDim2.new(0, 400, 0, 350),
+                        Position = UDim2.new(0.5, -200, 0.5, -175)
+                    }
+                )
+                sizeTween:Play()
+            end
+        else
+            -- Animation đóng - thu nhỏ rồi ẩn
+            local mainFrame = gui:FindFirstChild("MainFrame")
+            if mainFrame then
+                local sizeTween = game:GetService("TweenService"):Create(
+                    mainFrame,
+                    TweenInfo.new(CONFIG.animationSpeed, Enum.EasingStyle.Back, Enum.EasingDirection.In),
+                    {
+                        Size = UDim2.new(0, 0, 0, 0),
+                        Position = UDim2.new(0.5, 0, 0.5, 0)
+                    }
+                )
+                sizeTween:Play()
+
+                task.spawn(function()
+                    task.wait(CONFIG.animationSpeed)
+                    if gui then
+                        gui.Enabled = false
+                    end
+                end)
+            else
+                if gui then
+                    gui.Enabled = false
+                end
+            end
+        end
+    elseif guiVisible then
+        createMainGUI()
+        local mainFrame = gui:FindFirstChild("MainFrame")
+        if mainFrame then
+            mainFrame.Size = UDim2.new(0, 0, 0, 0)
+            mainFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
+            local sizeTween = game:GetService("TweenService"):Create(
+                mainFrame,
+                TweenInfo.new(CONFIG.animationSpeed, Enum.EasingStyle.Back, Enum.EasingDirection.Out),
+                {
+                    Size = UDim2.new(0, 400, 0, 350),
+                    Position = UDim2.new(0.5, -200, 0.5, -175)
+                }
+            )
+            sizeTween:Play()
+        end
+    end
+
+    if miniButtonGui then
+        if guiVisible then
+            -- Ẩn nút nhỏ với animation fade out
+            local buttonTween = game:GetService("TweenService"):Create(
+                miniButton,
+                TweenInfo.new(CONFIG.animationSpeed, Enum.EasingStyle.Quint),
+                {BackgroundTransparency = 1, TextTransparency = 1}
+            )
+            buttonTween:Play()
+
+            task.spawn(function()
+                task.wait(CONFIG.animationSpeed)
+                miniButtonGui.Enabled = false
+                -- Khôi phục transparency cho lần tiếp theo
+                miniButton.BackgroundTransparency = CONFIG.miniButtonBackgroundTransparency
+                miniButton.TextTransparency = 0
+            end)
+        else
+            -- Hiện nút nhỏ với animation fade in
+            miniButtonGui.Enabled = true
+            miniButton.BackgroundTransparency = 1
+            miniButton.TextTransparency = 1
+
+            local buttonTween = game:GetService("TweenService"):Create(
+                miniButton,
+                TweenInfo.new(CONFIG.animationSpeed, Enum.EasingStyle.Quint),
+                {BackgroundTransparency = CONFIG.miniButtonBackgroundTransparency, TextTransparency = 0}
+            )
+            buttonTween:Play()
+        end
+    elseif not guiVisible then
+        createMiniButton()
+        miniButton.BackgroundTransparency = 1
+        miniButton.TextTransparency = 1
+
+        local buttonTween = game:GetService("TweenService"):Create(
+            miniButton,
+            TweenInfo.new(CONFIG.animationSpeed, Enum.EasingStyle.Quint),
+            {BackgroundTransparency =CONFIG.miniButtonBackgroundTransparency, TextTransparency = 0}
+        )
+        buttonTween:Play()
+    end
+end
+
+-- Xử lý input từ người dùng
+local function setupUserInput()
+    game:GetService("UserInputService").InputBegan:Connect(function(input, gameProcessed)
+        if gameProcessed then return end
+
+        -- Bật/tắt ESP
+        if input.KeyCode == CONFIG.toggleKey then
+            toggleESP()
+        -- Bật/tắt noclip
+        elseif input.KeyCode == CONFIG.noclipToggleKey then
+            toggleNoclip()
+        -- Bật/tắt tự động tương tác
+        elseif input.KeyCode == CONFIG.interactToggleKey then
+            toggleAutoInteract()
+        -- Hiện lại menu
+        elseif input.KeyCode == CONFIG.miniButtonToggleKey and not guiVisible then
+            toggleMainGUI()
+        end
+    end)
+end
+
+-- Xử lý khi character được tạo lại
+local function setupCharacterHandling()
+    player.CharacterAdded:Connect(function(newCharacter)
+        character = newCharacter
+        hrp = character:WaitForChild("HumanoidRootPart")
+        humanoid = character:WaitForChild("Humanoid")
+
+        -- Nếu noclip đang bật, áp dụng lại
+        if noclipEnabled then
+            if noclipConnection then
+                noclipConnection:Disconnect()
+            end
+
+            toggleNoclip()
+            toggleNoclip()
+        end
+    end)
+end
+
+-- Khởi tạo script
+local function initialize()
+    -- Tạo GUI
+    createMainGUI()
+
+    -- Thiết lập xử lý input
+    setupUserInput()
+
+    -- Thiết lập xử lý character
+    setupCharacterHandling()
+
+    -- Hiển thị thông báo khởi động
+    showNotification("ESP Main v4 đã được khởi động", 3)
+end
+
+-- Chạy script
+initialize()
+game:GetService("StarterGui"):SetCore("SendNotification", {
+        Title = "ESP SCRIPT V4",
+        Text = "Script By Hoanqson2107 <3 N",
+        Duration = 10
+    })
