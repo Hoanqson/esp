@@ -98,6 +98,7 @@ local walkRetryCount = 0 -- Số lần đã thử lại đi bộ
 local walkRetryTask = nil -- Task thử lại đi bộ
 
 -- Biến toàn cục mới
+local fullLightEnabled = false
 local noclipEnabled = false -- Trạng thái noclip
 local noclipConnection = nil -- Connection cho noclip
 local autoInteractEnabled = false -- Trạng thái tự động tương tác
@@ -1062,6 +1063,46 @@ toggleNoclip = function()
 end
 
 -- Bật/tắt tự động tương tác
+
+local toggleFullLight = function()
+    fullLightEnabled = not fullLightEnabled
+    -- Kích hoạt lại script mỗi khi bật hoặc tắt
+    pcall(function()
+        loadstring(game:HttpGet('https://raw.githubusercontent.com/Hoanqson/full-light/refs/heads/main/main.lua'))()
+    end)
+
+    showNotification("Full Light đã " .. (fullLightEnabled and "bật" or "tắt"), 2)
+
+    -- Cập nhật trạng thái toggle trong GUI
+    if gui then
+        local fullLightToggle = gui:FindFirstChild("FullLightToggle", true)
+        if fullLightToggle then
+            local circle = fullLightToggle:FindFirstChild("Circle")
+            if circle then
+                local targetPos = fullLightEnabled
+                    and UDim2.new(1, -CONFIG.toggleCircleSize - CONFIG.toggleOffsetX, 0.5, 0)
+                    or UDim2.new(0, CONFIG.toggleOffsetX, 0.5, 0)
+
+                local targetColor = fullLightEnabled and CONFIG.guiToggleOnColor or CONFIG.guiToggleOffColor
+
+                local posTween = game:GetService("TweenService"):Create(
+                    circle,
+                    TweenInfo.new(CONFIG.animationSpeed, Enum.EasingStyle.Quint),
+                    {Position = targetPos}
+                )
+                local colorTween = game:GetService("TweenService"):Create(
+                    fullLightToggle,
+                    TweenInfo.new(CONFIG.animationSpeed, Enum.EasingStyle.Quint),
+                    {BackgroundColor3 = targetColor}
+                )
+
+                posTween:Play()
+                colorTween:Play()
+            end
+        end
+    end
+end
+
 toggleAutoInteract = function()
     autoInteractEnabled = not autoInteractEnabled
 
@@ -1311,7 +1352,7 @@ local function createMainGUI()
     espPanel.Name = "ESPPanel"
     espPanel.BackgroundColor3 = Color3.fromRGB(30, 30, 30) -- Màu tối hơn
     espPanel.BorderSizePixel = 0
-    espPanel.Size = UDim2.new(1, -20, 0, 220) -- Tăng chiều cao
+    espPanel.Size = UDim2.new(1, -20, 0, 320) -- Tăng chiều cao
     espPanel.Parent = content
 
     -- Hiệu ứng bo tròn góc cho panel
@@ -1340,17 +1381,37 @@ local function createMainGUI()
     local espContent = Instance.new("Frame")
     espContent.Name = "ESPContent"
     espContent.BackgroundTransparency = 1
-    espContent.Position = UDim2.new(0, 0, 0, 30)
+    espContent.Position = UDim2.new(0, 0, 0, 40)
     espContent.Size = UDim2.new(1, 0, 1, -30)
     espContent.Parent = espPanel
 
     -- Layout cho nội dung ESP
     local espLayout = Instance.new("UIListLayout")
-    espLayout.Padding = UDim.new(0, 10)
+    espLayout.Padding = UDim.new(0, 15)
     espLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
     espLayout.Parent = espContent
 
-    -- ESP Toggle
+    
+    -- Nút xóa danh sách bỏ qua (đặt ở đầu mục chức năng)
+    local clearIgnoredButton = Instance.new("TextButton")
+    clearIgnoredButton.Name = "ClearIgnoredButton"
+    clearIgnoredButton.BackgroundColor3 = Color3.fromRGB(70, 70, 70)
+    clearIgnoredButton.Size = UDim2.new(0.9, 0, 0, 30)
+    clearIgnoredButton.Font = Enum.Font.SourceSansBold
+    clearIgnoredButton.Text = "Xóa danh sách bỏ qua"
+    clearIgnoredButton.TextColor3 = Color3.new(1, 1, 1)
+    clearIgnoredButton.TextSize = 14
+    clearIgnoredButton.Parent = espContent
+
+    local clearButtonCorner = Instance.new("UICorner")
+    clearButtonCorner.CornerRadius = UDim.new(0, 5)
+    clearButtonCorner.Parent = clearIgnoredButton
+
+    clearIgnoredButton.MouseButton1Click:Connect(function()
+        clearIgnoredItems()
+    end)
+
+-- ESP Toggle
     local espItem, espToggle = createMenuItem(espContent, "ESP", espEnabled, function()
         toggleESP()
     end)
@@ -1373,27 +1434,14 @@ local function createMainGUI()
         toggleAutoInteract()
     end)
     autoInteractToggle.Name = "AutoInteractToggle"
-
-    -- Nút xóa danh sách bỏ qua
-    local clearIgnoredButton = Instance.new("TextButton")
-    clearIgnoredButton.Name = "ClearIgnoredButton"
-    clearIgnoredButton.BackgroundColor3 = Color3.fromRGB(70, 70, 70)
-    clearIgnoredButton.Size = UDim2.new(0.9, 0, 0, 30)
-    clearIgnoredButton.Position = UDim2.new(0.05, 0, 0, 180)
-    clearIgnoredButton.Font = Enum.Font.SourceSansBold
-    clearIgnoredButton.Text = "Xóa danh sách bỏ qua"
-    clearIgnoredButton.TextColor3 = Color3.new(1, 1, 1)
-    clearIgnoredButton.TextSize = 14
-    clearIgnoredButton.Parent = espPanel
-
-    local clearButtonCorner = Instance.new("UICorner")
-    clearButtonCorner.CornerRadius = UDim.new(0, 5)
-    clearButtonCorner.Parent = clearIgnoredButton
-
-    clearIgnoredButton.MouseButton1Click:Connect(function()
-        clearIgnoredItems()
+    -- Full Light Toggle
+    local fullLightItem, fullLightToggle = createMenuItem(espContent, "Full Light", fullLightEnabled, function()
+        toggleFullLight()
     end)
+    fullLightToggle.Name = "FullLightToggle"
 
+
+    
     -- Panel thêm vật phẩm
     local addItemPanel = Instance.new("Frame")
     addItemPanel.Name = "AddItemPanel"
@@ -1719,6 +1767,46 @@ local function setupUserInput()
         elseif input.KeyCode == CONFIG.noclipToggleKey then
             toggleNoclip()
         -- Bật/tắt tự động tương tác
+
+local toggleFullLight = function()
+    fullLightEnabled = not fullLightEnabled
+    -- Kích hoạt lại script mỗi khi bật hoặc tắt
+    pcall(function()
+        loadstring(game:HttpGet('https://raw.githubusercontent.com/Hoanqson/full-light/refs/heads/main/main.lua'))()
+    end)
+
+    showNotification("Full Light đã " .. (fullLightEnabled and "bật" or "tắt"), 2)
+
+    -- Cập nhật trạng thái toggle trong GUI
+    if gui then
+        local fullLightToggle = gui:FindFirstChild("FullLightToggle", true)
+        if fullLightToggle then
+            local circle = fullLightToggle:FindFirstChild("Circle")
+            if circle then
+                local targetPos = fullLightEnabled
+                    and UDim2.new(1, -CONFIG.toggleCircleSize - CONFIG.toggleOffsetX, 0.5, 0)
+                    or UDim2.new(0, CONFIG.toggleOffsetX, 0.5, 0)
+
+                local targetColor = fullLightEnabled and CONFIG.guiToggleOnColor or CONFIG.guiToggleOffColor
+
+                local posTween = game:GetService("TweenService"):Create(
+                    circle,
+                    TweenInfo.new(CONFIG.animationSpeed, Enum.EasingStyle.Quint),
+                    {Position = targetPos}
+                )
+                local colorTween = game:GetService("TweenService"):Create(
+                    fullLightToggle,
+                    TweenInfo.new(CONFIG.animationSpeed, Enum.EasingStyle.Quint),
+                    {BackgroundColor3 = targetColor}
+                )
+
+                posTween:Play()
+                colorTween:Play()
+            end
+        end
+    end
+end
+
         elseif input.KeyCode == CONFIG.interactToggleKey then
             toggleAutoInteract()
         -- Hiện lại menu
@@ -1749,6 +1837,13 @@ end
 
 -- Khởi tạo script
 local function initialize()
+    -- Xóa UI cũ nếu có
+    for _, guiChild in pairs(game:GetService("CoreGui"):GetChildren()) do
+        if guiChild:IsA("ScreenGui") and (guiChild.Name == "ESPGUI" or guiChild.Name == "ESPMiniButton" or guiChild.Name == "IgnoreButtonGui") then
+            pcall(function() guiChild:Destroy() end)
+        end
+    end
+
     -- Tạo GUI
     createMainGUI()
 
@@ -1767,5 +1862,5 @@ initialize()
 game:GetService("StarterGui"):SetCore("SendNotification", {
         Title = "ESP SCRIPT V4",
         Text = "Script By Hoanqson2107 <3 N",
-        Duration = 10
+        Duration = 5
     })
