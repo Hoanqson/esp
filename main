@@ -8,7 +8,7 @@ local CONFIG = {
     -- Cấu hình ESP
     targetNames = {"Bond"}, -- Tên item cần tìm, có thể thêm nhiều tên
     espColor = Color3.fromRGB(0, 191, 255), -- Màu của nhãn ESP (xanh dương)
-    maxDistance = 3000, -- Khoảng cách tối đa để hiển thị ESP (đơn vị studs)
+    maxDistance = 2500, -- Khoảng cách tối đa để hiển thị ESP (đơn vị studs)
     updateInterval = 1, -- Cập nhật ESP mỗi giây
     refreshInterval = 5, -- Thời gian làm mới danh sách vật phẩm (giây)
     toggleKey = Enum.KeyCode.B, -- Phím để bật/tắt ESP
