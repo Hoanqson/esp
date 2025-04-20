@@ -6,9 +6,9 @@ local humanoid = character:WaitForChild("Humanoid")
 -- Cấu hình có thể thay đổi
 local CONFIG = {
     -- Cấu hình ESP
-    targetNames = {"Bond,Wolf"}, -- Tên item cần tìm, có thể thêm nhiều tên
+    targetNames = {"Bond","Unicorn","StrangeMask"}, -- Tên item cần tìm, có thể thêm nhiều tên
     espColor = Color3.fromRGB(0, 191, 255), -- Màu của nhãn ESP (xanh dương)
-    maxDistance = 2500, -- Khoảng cách tối đa để hiển thị ESP (đơn vị studs)
+    maxDistance = 1000, -- Khoảng cách tối đa để hiển thị ESP (đơn vị studs)
     updateInterval = 1, -- Cập nhật ESP mỗi giây
     refreshInterval = 5, -- Thời gian làm mới danh sách vật phẩm (giây)
     toggleKey = Enum.KeyCode.B, -- Phím để bật/tắt ESP
@@ -81,6 +81,8 @@ local CONFIG = {
 }
 
 -- Biến toàn cục
+local infJumpEnabled = false
+local infJumpDebounce = false
 local espEnabled = false -- Bắt đầu với ESP tắt
 local allESPObjects = {}
 local foundItems = {}
@@ -1252,6 +1254,58 @@ local function createMenuItem(parent, text, toggled, clickHandler)
     return itemContainer, toggleButton
 end
 
+
+-- Infinite Jump Toggle Function
+-- Infinite Jump Toggle Function
+local function toggleInfJump()
+    infJumpEnabled = not infJumpEnabled
+
+    if infJumpEnabled then
+        showNotification("Infinite Jump đã bật", 2)
+    else
+        showNotification("Infinite Jump đã tắt", 2)
+    end
+
+    if gui then
+        local infJumpToggle = gui:FindFirstChild("InfJumpToggle", true)
+        if infJumpToggle then
+            local circle = infJumpToggle:FindFirstChild("Circle")
+            if circle then
+                local targetPos = infJumpEnabled
+                    and UDim2.new(1, -CONFIG.toggleCircleSize - CONFIG.toggleOffsetX, 0.5, 0)
+                    or UDim2.new(0, CONFIG.toggleOffsetX, 0.5, 0)
+
+                local targetColor = infJumpEnabled and CONFIG.guiToggleOnColor or CONFIG.guiToggleOffColor
+
+                local posTween = game:GetService("TweenService"):Create(circle, TweenInfo.new(CONFIG.animationSpeed), {Position = targetPos})
+                local colorTween = game:GetService("TweenService"):Create(infJumpToggle, TweenInfo.new(CONFIG.animationSpeed), {BackgroundColor3 = targetColor})
+                posTween:Play()
+                colorTween:Play()
+            end
+        end
+    end
+end
+
+    if gui then
+        local infJumpToggle = gui:FindFirstChild("InfJumpToggle", true)
+        if infJumpToggle then
+            local circle = infJumpToggle:FindFirstChild("Circle")
+            if circle then
+                local targetPos = infJumpEnabled
+                    and UDim2.new(1, -CONFIG.toggleCircleSize - CONFIG.toggleOffsetX, 0.5, 0)
+                    or UDim2.new(0, CONFIG.toggleOffsetX, 0.5, 0)
+
+                local targetColor = infJumpEnabled and CONFIG.guiToggleOnColor or CONFIG.guiToggleOffColor
+
+                local posTween = game:GetService("TweenService"):Create(circle, TweenInfo.new(CONFIG.animationSpeed), {Position = targetPos})
+                local colorTween = game:GetService("TweenService"):Create(infJumpToggle, TweenInfo.new(CONFIG.animationSpeed), {BackgroundColor3 = targetColor})
+                posTween:Play()
+                colorTween:Play()
+            end
+        end
+    end
+
+
 -- Tạo GUI chính
 local function createMainGUI()
     -- Xóa GUI cũ nếu có
@@ -1352,7 +1406,7 @@ local function createMainGUI()
     espPanel.Name = "ESPPanel"
     espPanel.BackgroundColor3 = Color3.fromRGB(30, 30, 30) -- Màu tối hơn
     espPanel.BorderSizePixel = 0
-    espPanel.Size = UDim2.new(1, -20, 0, 320) -- Tăng chiều cao
+    espPanel.Size = UDim2.new(1, -20, 0, 360) -- Tăng chiều cao
     espPanel.Parent = content
 
     -- Hiệu ứng bo tròn góc cho panel
@@ -1435,6 +1489,12 @@ local function createMainGUI()
     end)
     autoInteractToggle.Name = "AutoInteractToggle"
     -- Full Light Toggle
+    -- Infinite Jump Toggle
+    local infJumpItem, infJumpToggle = createMenuItem(espContent, "Infinite Jump", infJumpEnabled, function()
+        toggleInfJump()
+    end)
+    infJumpToggle.Name = "InfJumpToggle"
+
     local fullLightItem, fullLightToggle = createMenuItem(espContent, "Full Light", fullLightEnabled, function()
         toggleFullLight()
     end)
@@ -1835,6 +1895,17 @@ local function setupCharacterHandling()
     end)
 end
 
+
+game:GetService("UserInputService").JumpRequest:Connect(function()
+    if infJumpEnabled and not infJumpDebounce and humanoid then
+        infJumpDebounce = true
+        humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
+        task.wait()
+        infJumpDebounce = false
+    end
+end)
+
+
 -- Khởi tạo script
 local function initialize()
     -- Xóa UI cũ nếu có
@@ -1856,6 +1927,28 @@ local function initialize()
     -- Hiển thị thông báo khởi động
     showNotification("ESP Main v4 đã được khởi động", 3)
 end
+
+
+
+    if gui then
+        local infJumpToggle = gui:FindFirstChild("InfJumpToggle", true)
+        if infJumpToggle then
+            local circle = infJumpToggle:FindFirstChild("Circle")
+            if circle then
+                local targetPos = infJumpEnabled
+                    and UDim2.new(1, -CONFIG.toggleCircleSize - CONFIG.toggleOffsetX, 0.5, 0)
+                    or UDim2.new(0, CONFIG.toggleOffsetX, 0.5, 0)
+
+                local targetColor = infJumpEnabled and CONFIG.guiToggleOnColor or CONFIG.guiToggleOffColor
+
+                local posTween = game:GetService("TweenService"):Create(circle, TweenInfo.new(CONFIG.animationSpeed), {Position = targetPos})
+                local colorTween = game:GetService("TweenService"):Create(infJumpToggle, TweenInfo.new(CONFIG.animationSpeed), {BackgroundColor3 = targetColor})
+                posTween:Play()
+                colorTween:Play()
+            end
+        end
+    end
+
 
 -- Chạy script
 initialize()
