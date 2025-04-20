@@ -6,7 +6,7 @@ local humanoid = character:WaitForChild("Humanoid")
 -- Cấu hình có thể thay đổi
 local CONFIG = {
     -- Cấu hình ESP
-    targetNames = {"Bond"}, -- Tên item cần tìm, có thể thêm nhiều tên
+    targetNames = {"Bond,Wolf"}, -- Tên item cần tìm, có thể thêm nhiều tên
     espColor = Color3.fromRGB(0, 191, 255), -- Màu của nhãn ESP (xanh dương)
     maxDistance = 2500, -- Khoảng cách tối đa để hiển thị ESP (đơn vị studs)
     updateInterval = 1, -- Cập nhật ESP mỗi giây
